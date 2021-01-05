@@ -1,4 +1,4 @@
-package com.kinnarastudio.declutter.function;
+package com.kinnarastudio.commons.function;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -13,19 +13,19 @@ import java.util.logging.Logger;
  * @param <E>
  */
 @FunctionalInterface
-public interface ThrowableFunction<T, R, E extends Exception> extends Function<T, R> {
+public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
 
     @Override
     default R apply(T t) {
         try {
-            return applyThrowable(t);
+            return tryApply(t);
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).severe(e.getMessage());
             return null;
         }
     }
 
-    R applyThrowable(T t) throws E;
+    R tryApply(T t) throws E;
 
     /**
      * @param f
@@ -34,7 +34,7 @@ public interface ThrowableFunction<T, R, E extends Exception> extends Function<T
     default Function<T, R> onException(Function<? super E, ? extends R> f) {
         return (T a) -> {
             try {
-                return (R) applyThrowable(a);
+                return (R) tryApply(a);
             } catch (Exception e) {
                 return f.apply((E) e);
             }
@@ -48,7 +48,7 @@ public interface ThrowableFunction<T, R, E extends Exception> extends Function<T
     default Function<T, R> onException(BiFunction<? super T, ? super E, ? extends R> f) {
         return (T a) -> {
             try {
-                return (R) applyThrowable(a);
+                return (R) tryApply(a);
             } catch (Exception e) {
                 return f.apply(a, (E) e);
             }

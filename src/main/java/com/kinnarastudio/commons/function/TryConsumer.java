@@ -1,4 +1,4 @@
-package com.kinnarastudio.declutter.function;
+package com.kinnarastudio.commons.function;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -11,14 +11,14 @@ import java.util.logging.Logger;
  * @param <E>
  */
 @FunctionalInterface
-public interface ThrowableConsumer<T, E extends Exception> extends Consumer<T> {
+public interface TryConsumer<T, E extends Exception> extends Consumer<T> {
 
-    void acceptThrowable(T t) throws E;
+    void tryAccept(T t) throws E;
 
     @Override
     default void accept(T t) {
         try {
-            acceptThrowable(t);
+            tryAccept(t);
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).severe(e.getMessage());
         }
@@ -29,7 +29,7 @@ public interface ThrowableConsumer<T, E extends Exception> extends Consumer<T> {
 
         return (T t) -> {
             try {
-                acceptThrowable(t);
+                tryAccept(t);
             } catch (Exception e) {
                 onException.accept((E) e);
             }

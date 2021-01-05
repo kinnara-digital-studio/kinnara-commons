@@ -1,4 +1,4 @@
-package com.kinnarastudio.declutter.function;
+package com.kinnarastudio.commons.function;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -13,12 +13,12 @@ import java.util.logging.Logger;
  * @param <E>
  */
 @FunctionalInterface
-public interface ThrowableBiConsumer<T, U, E extends Exception> extends BiConsumer<T, U> {
-    void acceptThrowable(T t, U u) throws E;
+public interface TryBiConsumer<T, U, E extends Exception> extends BiConsumer<T, U> {
+    void tryAccept(T t, U u) throws E;
 
     default void accept(T t, U u) {
         try {
-            acceptThrowable(t, u);
+            tryAccept(t, u);
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).severe(e.getMessage());
         }
@@ -29,7 +29,7 @@ public interface ThrowableBiConsumer<T, U, E extends Exception> extends BiConsum
 
         return (T t, U u) -> {
             try {
-                acceptThrowable(t, u);
+                tryAccept(t, u);
             } catch (Exception e) {
                 consumer.accept((E)e);
             }
