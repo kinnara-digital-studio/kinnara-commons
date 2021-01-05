@@ -1,3 +1,6 @@
+package com.kinnarastudio.declutter;
+
+import com.kinnarastudio.declutter.function.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,7 +10,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.*;
-import java.util.logging.Logger;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,7 +19,6 @@ import java.util.stream.StreamSupport;
  * Mixin for stream processing
  */
 public interface Declutter {
-
     /**
      * Nullsafe. If string is null or empty
      *
@@ -159,7 +160,6 @@ public interface Declutter {
             if(t != null) {
                 array.put(t);
             }
-
         }, (left, right) -> {
             jsonStream(right).forEach(throwableConsumer(left::put));
             return left;
@@ -352,211 +352,4 @@ public interface Declutter {
     }
 
     // Extension for functional interfaces
-
-    @FunctionalInterface
-    interface ThrowableSupplier<R, E extends Exception> extends Supplier<R> {
-        @Nullable
-        R getThrowable() throws E;
-
-        @Nullable
-        default R get() {
-            try {
-                return getThrowable();
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-                return null;
-            }
-        }
-
-        default ThrowableSupplier<R, E> onException(Function<? super E, R> onException) {
-            try {
-                return this::getThrowable;
-            } catch (Exception e) {
-                Objects.requireNonNull(onException);
-                return () -> onException.apply((E) e);
-            }
-        }
-    }
-
-    /**
-     * Throwable version of {@link Function}.
-     * Returns null then exception is raised
-     *
-     * @param <T>
-     * @param <R>
-     * @param <E>
-     */
-    @FunctionalInterface
-    interface ThrowableFunction<T, R, E extends Exception> extends Function<T, R> {
-
-        @Override
-        default R apply(T t) {
-            try {
-                return applyThrowable(t);
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-                return null;
-            }
-        }
-
-        R applyThrowable(T t) throws E;
-
-        /**
-         * @param f
-         * @return
-         */
-        default Function<T, R> onException(Function<? super E, ? extends R> f) {
-            return (T a) -> {
-                try {
-                    return (R) applyThrowable(a);
-                } catch (Exception e) {
-                    return f.apply((E) e);
-                }
-            };
-        }
-
-        /**
-         * @param f
-         * @return
-         */
-        default Function<T, R> onException(BiFunction<? super T, ? super E, ? extends R> f) {
-            return (T a) -> {
-                try {
-                    return (R) applyThrowable(a);
-                } catch (Exception e) {
-                    return f.apply(a, (E) e);
-                }
-            };
-        }
-    }
-
-    /**
-     * Throwable version of {@link Consumer}
-     *
-     * @param <T>
-     * @param <E>
-     */
-    @FunctionalInterface
-    interface ThrowableConsumer<T, E extends Exception> extends Consumer<T> {
-
-        void acceptThrowable(T t) throws E;
-
-        @Override
-        default void accept(T t) {
-            try {
-                acceptThrowable(t);
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-            }
-        }
-
-        default Consumer<T> onException(final Consumer<? super E> onException) {
-            Objects.requireNonNull(onException);
-
-            return (T t) -> {
-                try {
-                    acceptThrowable(t);
-                } catch (Exception e) {
-                    onException.accept((E) e);
-                }
-            };
-        }
-    }
-
-    /**
-     * Throwable version of {@link BiConsumer}
-     *
-     * @param <T>
-     * @param <U>
-     * @param <E>
-     */
-    @FunctionalInterface
-    interface ThrowableBiConsumer<T, U, E extends Exception> extends BiConsumer<T, U> {
-        void acceptThrowable(T t, U u) throws E;
-
-        default void accept(T t, U u) {
-            try {
-                acceptThrowable(t, u);
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-            }
-        }
-
-        default BiConsumer<T, U> onException(Consumer<? super E> consumer) {
-            Objects.requireNonNull(consumer);
-
-            return (T t, U u) -> {
-                try {
-                    acceptThrowable(t, u);
-                } catch (Exception e) {
-                    consumer.accept((E)e);
-                }
-            };
-
-        }
-    }
-
-    /**
-     * Throwable version of {@link Predicate}
-     *
-     * @param <T>
-     * @param <E>
-     */
-    @FunctionalInterface
-    interface ThrowablePredicate<T, E extends Exception> extends Predicate<T> {
-
-        boolean testThrowable(T t) throws E;
-
-        @Override
-        default boolean test(T t) {
-            try {
-                return testThrowable(t);
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-                return false;
-            }
-        }
-
-        default Predicate<T> onException(Predicate<? super E> predicate) {
-            return (T t) -> {
-                try {
-                    return testThrowable(t);
-                } catch (Exception e) {
-                    return predicate.test((E)e);
-                }
-            };
-        }
-    }
-
-    /**
-     * Throwable BiFunction
-     *
-     * @param <T>
-     * @param <U>
-     * @param <R>
-     * @param <E>
-     */
-    @FunctionalInterface
-    interface ThrowableBiFunction<T, U, R, E extends Exception> extends BiFunction<T, U, R> {
-        R applyThrowable(T t, U u) throws E;
-
-        default R apply(T t, U u) {
-            try {
-                return applyThrowable(t, u);
-            } catch (Exception e) {
-                Logger.getLogger(getClass().getName()).severe(e.getMessage());
-                return null;
-            }
-        }
-
-        default BiFunction<T, U, R> onException(Function<E, R> f) {
-            return (T t, U u) -> {
-                try {
-                    return applyThrowable(t, u);
-                } catch (Exception e) {
-                    return f.apply((E) e);
-                }
-            };
-        }
-    }
 }
