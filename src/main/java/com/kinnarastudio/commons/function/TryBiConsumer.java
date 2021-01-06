@@ -24,7 +24,7 @@ public interface TryBiConsumer<T, U, E extends Exception> extends BiConsumer<T, 
         }
     }
 
-    default BiConsumer<T, U> onException(Consumer<? super E> consumer) {
+    default BiConsumer<T, U> onCatch(Consumer<? super E> consumer) {
         Objects.requireNonNull(consumer);
 
         return (T t, U u) -> {

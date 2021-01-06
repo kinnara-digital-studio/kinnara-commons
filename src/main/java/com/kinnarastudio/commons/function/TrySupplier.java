@@ -27,12 +27,12 @@ public interface TrySupplier<R, E extends Exception> extends Supplier<R> {
         }
     }
 
-    default TrySupplier<R, E> onException(Function<? super E, R> onException) {
+    default TrySupplier<R, E> onCatch(Function<? super E, R> onCatch) {
         try {
             return this::tryGet;
         } catch (Exception e) {
-            Objects.requireNonNull(onException);
-            return () -> onException.apply((E) e);
+            Objects.requireNonNull(onCatch);
+            return () -> onCatch.apply((E) e);
         }
     }
 }

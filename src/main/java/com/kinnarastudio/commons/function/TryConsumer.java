@@ -24,14 +24,14 @@ public interface TryConsumer<T, E extends Exception> extends Consumer<T> {
         }
     }
 
-    default Consumer<T> onException(final Consumer<? super E> onException) {
-        Objects.requireNonNull(onException);
+    default Consumer<T> onCatch(final Consumer<? super E> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return (T t) -> {
             try {
                 tryAccept(t);
             } catch (Exception e) {
-                onException.accept((E) e);
+                onCatch.accept((E) e);
             }
         };
     }

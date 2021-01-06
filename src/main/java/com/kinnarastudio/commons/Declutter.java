@@ -27,7 +27,7 @@ public interface Declutter {
      */
     default boolean isEmpty(@Nullable Object value) {
         return Optional.ofNullable(value)
-                .map(String::valueOf)
+                .map(tryFunction(String::valueOf))
                 .map(String::isEmpty)
                 .orElse(true);
     }
@@ -131,7 +131,7 @@ public interface Declutter {
         int length = Optional.ofNullable(jsonArray).map(JSONArray::length).orElse(0);
         return IntStream.iterate(0, i -> i + 1).limit(length)
                 .boxed()
-                .map(integer -> extractor.onException(jsonException -> null).apply(jsonArray, integer))
+                .map(integer -> extractor.onCatch(jsonException -> null).apply(jsonArray, integer))
                 .filter(Objects::nonNull);
     }
 
@@ -237,7 +237,7 @@ public interface Declutter {
         };
     }
 
-    // Throwable methods
+    // Try methods
     /**
      *
      * @param trySupplier
@@ -245,12 +245,21 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <R, E extends Exception> TrySupplier<R, E> throwableSupplier(TrySupplier<R, E> trySupplier) {
+    default <R, E extends Exception> TrySupplier<R, E> trySupplier(TrySupplier<R, E> trySupplier) {
         return trySupplier;
     }
 
-    default <R, E extends Exception> TrySupplier<R, E> throwableSupplier(TrySupplier<R, E> trySupplier, Function<? super E, R> onException) {
-        return trySupplier.onException(onException);
+    /**
+     * Try Supplier with exception handling
+     *
+     * @param supplier
+     * @param onCatch
+     * @param <R>
+     * @param <E>
+     * @return
+     */
+    default <R, E extends Exception> TrySupplier<R, E> trySupplier(TrySupplier<R, E> supplier, Function<? super E, R> onCatch) {
+        return supplier.onCatch(onCatch);
     }
 
     /**
@@ -265,25 +274,25 @@ public interface Declutter {
 
     /**
      *
-     * @param tryConsumer
+     * @param consumer
      * @param failover
      * @param <T>
      * @param <E>
      * @return
      */
-    default <T, E extends Exception> Consumer<T> tryConsumer(TryConsumer<T, E> tryConsumer, Consumer<? super E> failover) {
-        return tryConsumer.onException(failover);
+    default <T, E extends Exception> Consumer<T> tryConsumer(TryConsumer<T, E> consumer, Consumer<? super E> failover) {
+        return consumer.onCatch(failover);
     }
 
     /**
-     * @param tryBiConsumer
+     * @param biConsumer
      * @param <T>
      * @param <U>
      * @param <E>
      * @return
      */
-    default <T, U, E extends Exception> TryBiConsumer<T, U, ? extends E> tryBiConsumer(TryBiConsumer<T, U, ? extends E> tryBiConsumer) {
-        return tryBiConsumer;
+    default <T, U, E extends Exception> TryBiConsumer<T, U, ? extends E> tryBiConsumer(TryBiConsumer<T, U, ? extends E> biConsumer) {
+        return biConsumer;
     }
 
     /**
@@ -293,7 +302,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> TryFunction<T, R, ? extends E> throwableFunction(TryFunction<T, R, ? extends E> tryFunction) {
+    default <T, R, E extends Exception> TryFunction<T, R, ? extends E> tryFunction(TryFunction<T, R, ? extends E> tryFunction) {
         return tryFunction;
     }
 
@@ -306,8 +315,8 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> Function<T, R> throwableFunction(TryFunction<T, R, E> tryFunction, Function<? super E, ? extends R> failoverFunction) {
-        return tryFunction.onException(failoverFunction);
+    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, Function<? super E, ? extends R> failoverFunction) {
+        return tryFunction.onCatch(failoverFunction);
     }
 
     /**
@@ -319,8 +328,8 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> Function<T, R> throwableFunction(TryFunction<T, R, E> tryFunction, BiFunction<T, E, R> failoverFunction) {
-        return tryFunction.onException(failoverFunction);
+    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, BiFunction<T, E, R> failoverFunction) {
+        return tryFunction.onCatch(failoverFunction);
     }
 
     /**
@@ -332,7 +341,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, U, R, E extends Exception> BiFunction<T, U, R> throwableBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
+    default <T, U, R, E extends Exception> BiFunction<T, U, R> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
         return tryBiFunction;
     }
 
@@ -346,9 +355,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, U, R, E extends Exception> BiFunction<T, U, R> throwableBiFunction(TryBiFunction<T, U, R, E> tryBiFunction, Function<E, R> failover) {
-        return tryBiFunction.onException(failover);
+    default <T, U, R, E extends Exception> BiFunction<T, U, R> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction, Function<E, R> failover) {
+        return tryBiFunction.onCatch(failover);
     }
-
-    // Extension for functional interfaces
 }

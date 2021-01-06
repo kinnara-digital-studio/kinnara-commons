@@ -24,7 +24,7 @@ public interface TryPredicate<T, E extends Exception> extends Predicate<T> {
         }
     }
 
-    default Predicate<T> onException(Predicate<? super E> predicate) {
+    default Predicate<T> onCatch(Predicate<? super E> predicate) {
         return (T t) -> {
             try {
                 return tryTest(t);

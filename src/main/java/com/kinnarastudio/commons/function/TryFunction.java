@@ -31,7 +31,7 @@ public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
      * @param f
      * @return
      */
-    default Function<T, R> onException(Function<? super E, ? extends R> f) {
+    default Function<T, R> onCatch(Function<? super E, ? extends R> f) {
         return (T a) -> {
             try {
                 return (R) tryApply(a);
@@ -45,7 +45,7 @@ public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
      * @param f
      * @return
      */
-    default Function<T, R> onException(BiFunction<? super T, ? super E, ? extends R> f) {
+    default Function<T, R> onCatch(BiFunction<? super T, ? super E, ? extends R> f) {
         return (T a) -> {
             try {
                 return (R) tryApply(a);
