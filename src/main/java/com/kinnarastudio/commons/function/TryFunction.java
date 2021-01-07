@@ -14,6 +14,7 @@ import java.util.logging.Logger;
  */
 @FunctionalInterface
 public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
+    R tryApply(T t) throws E;
 
     @Override
     default R apply(T t) {
@@ -25,16 +26,14 @@ public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
         }
     }
 
-    R tryApply(T t) throws E;
-
     /**
      * @param f
      * @return
      */
     default Function<T, R> onCatch(Function<? super E, ? extends R> f) {
-        return (T a) -> {
+        return t -> {
             try {
-                return (R) tryApply(a);
+                return (R) tryApply(t);
             } catch (Exception e) {
                 return f.apply((E) e);
             }
@@ -46,11 +45,11 @@ public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
      * @return
      */
     default Function<T, R> onCatch(BiFunction<? super T, ? super E, ? extends R> f) {
-        return (T a) -> {
+        return t -> {
             try {
-                return (R) tryApply(a);
+                return (R) tryApply(t);
             } catch (Exception e) {
-                return f.apply(a, (E) e);
+                return f.apply(t, (E) e);
             }
         };
     }

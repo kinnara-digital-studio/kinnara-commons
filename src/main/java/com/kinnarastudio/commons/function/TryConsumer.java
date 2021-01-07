@@ -1,6 +1,7 @@
 package com.kinnarastudio.commons.function;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -24,14 +25,26 @@ public interface TryConsumer<T, E extends Exception> extends Consumer<T> {
         }
     }
 
-    default Consumer<T> onCatch(final Consumer<? super E> onCatch) {
-        Objects.requireNonNull(onCatch);
+    default Consumer<T> onCatch(final Consumer<? super E> consumer) {
+        Objects.requireNonNull(consumer);
 
-        return (T t) -> {
+        return t -> {
             try {
                 tryAccept(t);
             } catch (Exception e) {
-                onCatch.accept((E) e);
+                consumer.accept((E) e);
+            }
+        };
+    }
+
+    default Consumer<T> onCatch(BiConsumer<T, ? super E> biConsumer) {
+        Objects.requireNonNull(biConsumer);
+
+        return t -> {
+            try {
+                tryAccept(t);
+            } catch (Exception e) {
+                biConsumer.accept(t, (E)e);
             }
         };
     }

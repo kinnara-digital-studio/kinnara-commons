@@ -2,7 +2,6 @@ package com.kinnarastudio.commons;
 
 import com.kinnarastudio.commons.function.*;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
@@ -127,11 +126,16 @@ public interface Declutter {
      * @param <R>
      * @return
      */
-    default <R> Stream<R> jsonStream(JSONArray jsonArray, TryBiFunction<JSONArray, Integer, R, JSONException> extractor) {
-        int length = Optional.ofNullable(jsonArray).map(JSONArray::length).orElse(0);
+    default <R> Stream<R> jsonStream(JSONArray jsonArray, BiFunction<JSONArray, Integer, R> extractor) {
+        Objects.requireNonNull(extractor);
+
+        int length = Optional.ofNullable(jsonArray)
+                .map(JSONArray::length)
+                .orElse(0);
+
         return IntStream.iterate(0, i -> i + 1).limit(length)
                 .boxed()
-                .map(integer -> extractor.onCatch(jsonException -> null).apply(jsonArray, integer))
+                .map(integer -> extractor.apply(jsonArray, integer))
                 .filter(Objects::nonNull);
     }
 
@@ -143,9 +147,34 @@ public interface Declutter {
      */
     default Stream<String> jsonStream(JSONObject jsonObject) {
         return Optional.ofNullable(jsonObject)
-                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                        (Iterator<String>)json.keys(), 0), false))
+                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(json.keys(), 0), false))
                 .orElseGet(Stream::empty);
+    }
+
+    /**
+     *
+     * @param jsonObject
+     * @param <R>
+     * @return
+     */
+    default <R> Stream<AbstractMap.SimpleImmutableEntry<String, R>> jsonStreamEntry(JSONObject jsonObject) {
+        return jsonStreamEntry(jsonObject, (json, key) -> (R) json.get(key));
+    }
+
+    /**
+     *
+     * @param jsonObject
+     * @param extractor
+     * @param <V>
+     * @return
+     */
+    default <V> Stream<AbstractMap.SimpleImmutableEntry<String, V>> jsonStreamEntry(JSONObject jsonObject, BiFunction<JSONObject, String, V> extractor) {
+        Objects.requireNonNull(extractor);
+
+        return Optional.ofNullable(jsonObject)
+                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(json.keys(), 0), false))
+                .orElseGet(Stream::empty)
+                .map(key -> new AbstractMap.SimpleImmutableEntry<>(key, extractor.apply(jsonObject, key)));
     }
 
     /**
@@ -204,7 +233,7 @@ public interface Declutter {
     }
 
     /**
-     * Can be used in {@link Optional#map(Function)} to "peek" in Optional
+     * Map to it's own value. Can be used in {@link Optional#map(Function)} to "peek" in Optional
      * Example : Optional.map(peekMap(o -> System.out.printl(o))
      *
      * @param consumer
@@ -213,7 +242,7 @@ public interface Declutter {
      */
     @Nonnull
     default <T> UnaryOperator<T> peekMap(@Nonnull final Consumer<T> consumer) {
-        return t -> {
+        return (final T t) -> {
             consumer.accept(t);
             return t;
         };
@@ -245,7 +274,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <R, E extends Exception> TrySupplier<R, E> trySupplier(TrySupplier<R, E> trySupplier) {
+    default <R, E extends Exception> Supplier<R> trySupplier(TrySupplier<R, E> trySupplier) {
         return trySupplier;
     }
 
@@ -253,13 +282,13 @@ public interface Declutter {
      * Try Supplier with exception handling
      *
      * @param supplier
-     * @param onCatch
+     * @param failover
      * @param <R>
      * @param <E>
      * @return
      */
-    default <R, E extends Exception> TrySupplier<R, E> trySupplier(TrySupplier<R, E> supplier, Function<? super E, R> onCatch) {
-        return supplier.onCatch(onCatch);
+    default <R, E extends Exception> Supplier<R> trySupplier(TrySupplier<R, E> supplier, Function<? super E, R> failover) {
+        return supplier.onCatch(failover);
     }
 
     /**
@@ -268,7 +297,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, E extends Exception> TryConsumer<T, ? super E> tryConsumer(TryConsumer<T, ? super E> consumer) {
+    default <T, E extends Exception> Consumer<T> tryConsumer(TryConsumer<T, ? super E> consumer) {
         return consumer;
     }
 
@@ -285,13 +314,25 @@ public interface Declutter {
     }
 
     /**
+     *
+     * @param consumer
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default <T, E extends Exception> Consumer<T> tryConsumer(TryConsumer<T, E> consumer, BiConsumer<T, ? super E> failover) {
+        return consumer.onCatch(failover);
+    }
+
+    /**
      * @param biConsumer
      * @param <T>
      * @param <U>
      * @param <E>
      * @return
      */
-    default <T, U, E extends Exception> TryBiConsumer<T, U, ? extends E> tryBiConsumer(TryBiConsumer<T, U, ? extends E> biConsumer) {
+    default <T, U, E extends Exception> BiConsumer<T, U> tryBiConsumer(TryBiConsumer<T, U, ? extends E> biConsumer) {
         return biConsumer;
     }
 
@@ -302,34 +343,34 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> TryFunction<T, R, ? extends E> tryFunction(TryFunction<T, R, ? extends E> tryFunction) {
+    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, ? extends E> tryFunction) {
         return tryFunction;
     }
 
     /**
      *
      * @param tryFunction
-     * @param failoverFunction
+     * @param failover
      * @param <T>
      * @param <R>
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, Function<? super E, ? extends R> failoverFunction) {
-        return tryFunction.onCatch(failoverFunction);
+    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, Function<? super E, ? extends R> failover) {
+        return tryFunction.onCatch(failover);
     }
 
     /**
      *
      * @param tryFunction
-     * @param failoverFunction
+     * @param failover
      * @param <T>
      * @param <R>
      * @param <E>
      * @return
      */
-    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, BiFunction<T, E, R> failoverFunction) {
-        return tryFunction.onCatch(failoverFunction);
+    default <T, R, E extends Exception> Function<T, R> tryFunction(TryFunction<T, R, E> tryFunction, BiFunction<T, E, R> failover) {
+        return tryFunction.onCatch(failover);
     }
 
     /**
@@ -341,7 +382,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, U, R, E extends Exception> BiFunction<T, U, R> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
+    default <T, U, R, E extends Exception> TryBiFunction<T, U, R, E> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
         return tryBiFunction;
     }
 
@@ -357,5 +398,21 @@ public interface Declutter {
      */
     default <T, U, R, E extends Exception> BiFunction<T, U, R> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction, Function<E, R> failover) {
         return tryBiFunction.onCatch(failover);
+    }
+
+    default <T, E extends Exception> Comparator<T> tryComparator(TryComparator<T, E> tryComparator) {
+        return tryComparator;
+    }
+
+    default <T, E extends Exception> Comparator<T> tryComparator(TryComparator<T, E> tryComparator, Function<E, Integer> failover) {
+        return tryComparator.onCatch(failover);
+    }
+
+    default <E extends Exception> Runnable tryRunnable(TryRunnable<E> tryRunnable) {
+        return tryRunnable;
+    }
+
+    default <E extends Exception> Runnable tryRunnable(TryRunnable<E> tryRunnable, Consumer<E> failover) {
+        return tryRunnable.onCatch(failover);
     }
 }
