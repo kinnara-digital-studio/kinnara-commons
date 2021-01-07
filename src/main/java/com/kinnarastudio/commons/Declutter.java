@@ -21,8 +21,8 @@ public interface Declutter {
     /**
      * Nullsafe. If string is null or empty
      *
-     * @param value
-     * @return
+     * @param value desc
+     * @return asdas
      */
     default boolean isEmpty(@Nullable Object value) {
         return Optional.ofNullable(value)
