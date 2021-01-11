@@ -6,7 +6,7 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Kinnara common library</description>
-    <url>https://github.com/kinnara-digital-studio/kinnara-commons/wiki</url>
+    <url>https://github.com/kinnara-digital-studio/kinnara-commons-declutter/wiki</url>
     <groupId>com.kinnarastudio</groupId>
     <artifactId>kinnara-commons-declutter</artifactId>
     <version>1.0.1</version>
@@ -94,9 +94,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com:kinnara-digital-studio/kinnara-commons.git</connection>
-        <developerConnection>scm:git:ssh://github.com:kinnara-digital-studio/kinnara-commons.git</developerConnection>
-        <url>https://github.com:kinnara-digital-studio/kinnara-commons/tree/master</url>
+        <connection>scm:git:git://github.com:kinnara-digital-studio/kinnara-commons-declutter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:kinnara-digital-studio/kinnara-commons-declutter.git</developerConnection>
+        <url>https://github.com:kinnara-digital-studio/kinnara-commons-declutter/tree/master</url>
     </scm>
 
     <distributionManagement>
