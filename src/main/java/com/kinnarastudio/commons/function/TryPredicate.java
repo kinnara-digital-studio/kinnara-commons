@@ -1,7 +1,7 @@
 package com.kinnarastudio.commons.function;
 
 import java.util.Objects;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -38,14 +38,14 @@ public interface TryPredicate<T, E extends Exception> extends Predicate<T> {
         };
     }
 
-    default Predicate<T> onCatch(BiFunction<T, ? super E, Boolean> biFunction) {
-        Objects.requireNonNull(biFunction);
+    default Predicate<T> onCatch(BiPredicate<T, ? super E> biPredicate) {
+        Objects.requireNonNull(biPredicate);
 
         return t -> {
             try {
                 return tryTest(t);
             } catch (Exception e) {
-                return biFunction.apply(t, (E)e);
+                return biPredicate.test(t, (E)e);
             }
         };
     }

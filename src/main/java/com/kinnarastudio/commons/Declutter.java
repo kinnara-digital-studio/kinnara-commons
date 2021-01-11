@@ -382,7 +382,7 @@ public interface Declutter {
      * @param <E>
      * @return
      */
-    default <T, U, R, E extends Exception> TryBiFunction<T, U, R, E> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
+    default <T, U, R, E extends Exception> BiFunction<T, U, R> tryBiFunction(TryBiFunction<T, U, R, E> tryBiFunction) {
         return tryBiFunction;
     }
 
@@ -400,18 +400,81 @@ public interface Declutter {
         return tryBiFunction.onCatch(failover);
     }
 
+    /**
+     *
+     * @param tryComparator
+     * @param <T>
+     * @param <E>
+     * @return
+     */
     default <T, E extends Exception> Comparator<T> tryComparator(TryComparator<T, E> tryComparator) {
         return tryComparator;
     }
 
+    /**
+     *
+     * @param tryComparator
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
     default <T, E extends Exception> Comparator<T> tryComparator(TryComparator<T, E> tryComparator, Function<E, Integer> failover) {
         return tryComparator.onCatch(failover);
     }
 
+    /**
+     *
+     * @param tryPredicate
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default <T, E extends Exception> Predicate<T> tryPredicate(TryPredicate<T, E> tryPredicate) {
+        return tryPredicate;
+    }
+
+    /**
+     *
+     * @param tryPredicate
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default <T, E extends Exception> Predicate<T> tryPredicate(TryPredicate<T, E> tryPredicate, Predicate<E> failover) {
+        return tryPredicate.onCatch(failover);
+    }
+
+    /**
+     *
+     * @param tryPredicate
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default <T, E extends Exception> Predicate<T> tryPredicate(TryPredicate<T, E> tryPredicate, BiPredicate<T, E> failover) {
+        return tryPredicate.onCatch(failover);
+    }
+
+    /**
+     *
+     * @param tryRunnable
+     * @param <E>
+     * @return
+     */
     default <E extends Exception> Runnable tryRunnable(TryRunnable<E> tryRunnable) {
         return tryRunnable;
     }
 
+    /**
+     *
+     * @param tryRunnable
+     * @param failover
+     * @param <E>
+     * @return
+     */
     default <E extends Exception> Runnable tryRunnable(TryRunnable<E> tryRunnable, Consumer<E> failover) {
         return tryRunnable.onCatch(failover);
     }
