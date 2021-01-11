@@ -9,7 +9,7 @@
     <url>https://github.com/kinnara-digital-studio/kinnara-commons-declutter/wiki</url>
     <groupId>com.kinnarastudio</groupId>
     <artifactId>kinnara-commons-declutter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
 
     <build>
         <plugins>
