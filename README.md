@@ -10,6 +10,16 @@ class Yourclass implements com.kinnarastudio.commons.Declutter {
     public yourMethod() {
         Collection<String> myStringCollection = ...
         
+        // turns this
+        myStringCollection.forEach(s -> {
+            try {
+                // some code that throws exceptions
+            } catch (Exception e) {
+            
+            }
+        });
+        
+        // to this
         myStringCollection.forEach(tryConsumer(s -> {
              // some code that throws exceptions
         });
