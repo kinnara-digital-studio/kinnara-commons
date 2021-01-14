@@ -172,7 +172,7 @@ public interface Declutter {
         Objects.requireNonNull(extractor);
 
         return Optional.ofNullable(jsonObject)
-                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(json.keys(), 0), false))
+                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize((Iterator<String>) json.keys(), 0), false))
                 .orElseGet(Stream::empty)
                 .map(key -> new AbstractMap.SimpleImmutableEntry<>(key, extractor.apply(jsonObject, String.valueOf(key))));
     }
