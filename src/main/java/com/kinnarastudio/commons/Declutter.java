@@ -116,7 +116,7 @@ public interface Declutter {
      * @return
      */
     default <R> Stream<R> jsonStream(JSONArray jsonArray) {
-        return jsonStream(jsonArray, (array, index) -> (R)array.get(index));
+        return jsonStream(jsonArray, (array, index) -> (R)array.opt(index));
     }
 
     /**
@@ -147,7 +147,7 @@ public interface Declutter {
      */
     default Stream<String> jsonStream(JSONObject jsonObject) {
         return Optional.ofNullable(jsonObject)
-                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(json.keys(), 0), false))
+                .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize((Iterator<String>) json.keys(), 0), false))
                 .orElseGet(Stream::empty);
     }
 
@@ -158,7 +158,7 @@ public interface Declutter {
      * @return
      */
     default <R> Stream<AbstractMap.SimpleImmutableEntry<String, R>> jsonStreamEntry(JSONObject jsonObject) {
-        return jsonStreamEntry(jsonObject, (json, key) -> (R) json.get(key));
+        return jsonStreamEntry(jsonObject, (json, key) -> (R) json.opt(key));
     }
 
     /**
@@ -174,7 +174,7 @@ public interface Declutter {
         return Optional.ofNullable(jsonObject)
                 .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(json.keys(), 0), false))
                 .orElseGet(Stream::empty)
-                .map(key -> new AbstractMap.SimpleImmutableEntry<>(key, extractor.apply(jsonObject, key)));
+                .map(key -> new AbstractMap.SimpleImmutableEntry<>(key, extractor.apply(jsonObject, String.valueOf(key))));
     }
 
     /**
