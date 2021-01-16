@@ -27,7 +27,7 @@ public interface TrySupplier<R, E extends Exception> extends Supplier<R> {
         }
     }
 
-    default Supplier<R> onCatch(Function<? super E, R> onCatch) {
+    default Supplier<R> onCatch(Function<? super E, ? extends R> onCatch) {
         Objects.requireNonNull(onCatch);
 
         return () -> {

@@ -1,6 +1,8 @@
 package com.kinnarastudio.commons;
 
 import com.kinnarastudio.commons.function.*;
+import com.kinnarastudio.commons.jsonstream.JSONCollectors;
+import com.kinnarastudio.commons.jsonstream.JSONStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -109,23 +111,30 @@ public interface Declutter {
     }
 
     /**
+     * Deprecated
+     * Use {@link JSONStream#of(JSONArray, BiFunction)}
+     * 
      * Stream JSONArray
      *
      * @param jsonArray
      * @param <R>
      * @return
      */
+    @Deprecated
     default <R> Stream<R> jsonStream(JSONArray jsonArray) {
         return jsonStream(jsonArray, (array, index) -> (R)array.opt(index));
     }
 
     /**
-     *
+     * Deprecated
+     * Use {@link JSONStream#of(JSONArray, BiFunction)}
+     *      
      * @param jsonArray
      * @param extractor
      * @param <R>
      * @return
      */
+    @Deprecated
     default <R> Stream<R> jsonStream(JSONArray jsonArray, BiFunction<JSONArray, Integer, R> extractor) {
         Objects.requireNonNull(extractor);
 
@@ -140,11 +149,15 @@ public interface Declutter {
     }
 
     /**
+     * Deprecated
+     * Use {@link JSONStream#of(JSONObject, BiFunction)}
+     * 
      * Stream keys of JSONObject
      *
      * @param jsonObject
      * @return
      */
+    @Deprecated
     default Stream<String> jsonStream(JSONObject jsonObject) {
         return Optional.ofNullable(jsonObject)
                 .map(json -> StreamSupport.stream(Spliterators.spliteratorUnknownSize((Iterator<String>) json.keys(), 0), false))
@@ -152,23 +165,29 @@ public interface Declutter {
     }
 
     /**
-     *
+     * Deprecated
+     * Use {@link JSONStream#of(JSONObject, BiFunction)}
+     * 
      * @param jsonObject
      * @param <R>
      * @return
      */
-    default <R> Stream<AbstractMap.SimpleImmutableEntry<String, R>> jsonStreamEntry(JSONObject jsonObject) {
+    @Deprecated
+    default <R> Stream<Map.Entry<String, R>> jsonStreamEntry(JSONObject jsonObject) {
         return jsonStreamEntry(jsonObject, (json, key) -> (R) json.opt(key));
     }
 
     /**
-     *
+     * Deprecated
+     * Use {@link JSONStream#of(JSONObject, BiFunction)}
+     * 
      * @param jsonObject
      * @param extractor
      * @param <V>
      * @return
      */
-    default <V> Stream<AbstractMap.SimpleImmutableEntry<String, V>> jsonStreamEntry(JSONObject jsonObject, BiFunction<JSONObject, String, V> extractor) {
+    @Deprecated
+    default <V> Stream<Map.Entry<String, V>> jsonStreamEntry(JSONObject jsonObject, BiFunction<JSONObject, String, V> extractor) {
         Objects.requireNonNull(extractor);
 
         return Optional.ofNullable(jsonObject)
@@ -178,11 +197,15 @@ public interface Declutter {
     }
 
     /**
+     * Deprecated
+     * Use {@link JSONCollectors#toJSONArray()}
+     * 
      * Collector for JSONArray
      *
      * @param <T>
      * @return
      */
+    @Deprecated
     default <T> Collector<T, JSONArray, JSONArray> jsonCollector() {
         return Collector.of(JSONArray::new, (array, t) -> {
             if(t != null) {
@@ -195,6 +218,9 @@ public interface Declutter {
     }
 
     /**
+     * Deprecated
+     * Use {@link JSONCollectors#toJSONObject(Function, Function)}
+     * 
      * Collector for JSONObject
      *
      * @param keyExtractor
@@ -203,6 +229,7 @@ public interface Declutter {
      * @param <V>
      * @return
      */
+    @Deprecated
     default <T, V> Collector<T, JSONObject, JSONObject> jsonCollector(Function<T, String> keyExtractor, Function<T, V> valueExtractor) {
         Objects.requireNonNull(keyExtractor);
         Objects.requireNonNull(valueExtractor);
@@ -477,5 +504,28 @@ public interface Declutter {
      */
     default <E extends Exception> Runnable tryRunnable(TryRunnable<E> tryRunnable, Consumer<E> failover) {
         return tryRunnable.onCatch(failover);
+    }
+
+    /**
+     *
+     * @param tryUnaryOperator
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default  <T, E extends Exception> UnaryOperator<T> tryUnaryOperator(TryUnaryOperator<T, ? extends E> tryUnaryOperator) {
+        return tryUnaryOperator;
+    }
+
+    /**
+     *
+     * @param tryUnaryOperator
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    default  <T, E extends Exception> UnaryOperator<T> tryUnaryOperator(TryUnaryOperator<T, ? extends E> tryUnaryOperator, Function<? super E, ? extends T> failover) {
+        return tryUnaryOperator.onCatch(failover);
     }
 }

@@ -9,7 +9,7 @@
     <url>https://github.com/kinnara-digital-studio/kinnara-commons-declutter/wiki</url>
     <groupId>com.kinnarastudio</groupId>
     <artifactId>kinnara-commons-declutter</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 
     <build>
         <plugins>
@@ -61,6 +61,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.kinnarastudio</groupId>
+            <artifactId>kinnara-commons-try</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20080701</version>
@@ -70,6 +75,12 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
