@@ -2,6 +2,7 @@ package com.kinnarastudio.commons.function;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -20,7 +21,7 @@ public interface TryBiFunction<T, U, R, E extends Exception> extends BiFunction<
         try {
             return tryApply(t, u);
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).severe(e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
             return null;
         }
     }

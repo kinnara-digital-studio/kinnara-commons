@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -22,7 +23,7 @@ public interface TrySupplier<R, E extends Exception> extends Supplier<R> {
         try {
             return tryGet();
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).severe(e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
             return null;
         }
     }

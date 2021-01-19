@@ -2,9 +2,11 @@ package com.kinnarastudio.commons.function;
 
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public interface TryUnaryOperator<T, E extends Exception> extends UnaryOperator<T> {
+
     T tryApply(T t) throws E;
 
     @Override
@@ -12,7 +14,7 @@ public interface TryUnaryOperator<T, E extends Exception> extends UnaryOperator<
         try {
             return tryApply(t);
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName(), e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
             return null;
         }
     }

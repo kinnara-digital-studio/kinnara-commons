@@ -3,6 +3,7 @@ package com.kinnarastudio.commons.function;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -19,7 +20,7 @@ public interface TryComparator<T, E extends Exception> extends Comparator<T> {
         try {
             return tryCompare(o1, o2);
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).severe(e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
             return 0;
         }
     }

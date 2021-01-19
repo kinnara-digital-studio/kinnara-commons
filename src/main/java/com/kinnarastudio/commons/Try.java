@@ -7,6 +7,29 @@ import java.util.function.*;
 
 public interface Try {
     /**
+     *
+     * @param trySupplier
+     * @param <R>
+     * @param <E>
+     * @return
+     */
+    static <R, E extends Exception> R on(TrySupplier<R, E> trySupplier) {
+        return trySupplier.get();
+    }
+
+    /**
+     *
+     * @param trySupplier
+     * @param failover
+     * @param <R>
+     * @param <E>
+     * @return
+     */
+    static <R, E extends Exception> R on(TrySupplier<R, E> trySupplier, Function <E, R> failover) {
+        return trySupplier.onCatch(failover).get();
+    }
+
+    /**
      * @param trySupplier
      * @param <R>
      * @param <E>

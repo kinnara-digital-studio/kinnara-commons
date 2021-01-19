@@ -3,6 +3,7 @@ package com.kinnarastudio.commons.function;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -21,7 +22,7 @@ public interface TryConsumer<T, E extends Exception> extends Consumer<T> {
         try {
             tryAccept(t);
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).severe(e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

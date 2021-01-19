@@ -88,6 +88,18 @@ public interface Declutter extends Try {
     }
 
     /**
+     *
+     * @param value
+     * @param then
+     * @param <T>
+     * @param <U>
+     * @return
+     */
+    default <T, U extends T> T ifNullThen(@Nullable T value, @Nonnull Supplier<U> then) {
+        return value == null ? then.get() : value;
+    }
+
+    /**
      * If value empty or null then return failover
      *
      * @param value
@@ -95,8 +107,21 @@ public interface Declutter extends Try {
      * @param <T>
      * @return
      */
+    @Nonnull
     default <T, U extends T> T ifEmptyThen(@Nullable T value, @Nonnull U then) {
-        return isEmpty(value) ? then : value;
+        return value == null || isEmpty(value) ? then : value;
+    }
+
+    /**
+     *
+     * @param value
+     * @param then
+     * @param <T>
+     * @param <U>
+     * @return
+     */
+    default <T, U extends T> T ifEmptyThen(@Nullable T value, @Nonnull Supplier<U> then) {
+        return isEmpty(value) ? then.get() : value;
     }
 
     /**
