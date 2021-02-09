@@ -9,7 +9,7 @@
     <url>https://github.com/kinnara-digital-studio/kinnara-commons/wiki</url>
     <groupId>com.kinnarastudio</groupId>
     <artifactId>kinnara-commons</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <build>
         <plugins>
@@ -60,11 +60,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>com.kinnarastudio</groupId>
-            <artifactId>kinnara-commons-try</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
