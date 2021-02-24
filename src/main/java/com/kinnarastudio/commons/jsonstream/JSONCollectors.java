@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -97,12 +98,26 @@ public interface JSONCollectors {
      * @return
      */
     static <T> Collector<T, JSONArray, JSONArray> toJSONArray(Supplier<JSONArray> initializer, Function<JSONArray, JSONArray> finisher) {
+        return toJSONArray(initializer, v -> v, finisher);
+    }
+
+    /**
+     *
+     * @param initializer
+     * @param valueExtractor
+     * @param finisher
+     * @param <T>
+     * @return
+     */
+    static <T, V> Collector<T, JSONArray, JSONArray> toJSONArray(Supplier<JSONArray> initializer, Function<T, V> valueExtractor, Function<JSONArray, JSONArray> finisher) {
         Objects.requireNonNull(initializer);
+        Objects.requireNonNull(valueExtractor);
         Objects.requireNonNull(finisher);
 
         return Collector.of(initializer, (array, t) -> {
-            if(t != null) {
-                array.put(t);
+            V value = valueExtractor.apply(t);
+            if(value != null) {
+                array.put(value);
             }
         }, (left, right) -> {
             JSONStream.of(right, JSONArray::opt).forEach(Try.onConsumer(left::put));
