@@ -5,12 +5,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * Generate {@link Collector} for {@link JSONObject} and {@link JSONArray}
@@ -52,13 +50,41 @@ public interface JSONCollectors {
      * @return
      */
     static <T, V> Collector<T, JSONObject, JSONObject> toJSONObject(Supplier<JSONObject> initializer, Function<T, String> keyExtractor, Function<T, V> valueExtractor, Function<JSONObject, JSONObject> finisher) {
+        return toJSONObject(initializer, keyExtractor, valueExtractor, finisher, s -> null);
+    }
+
+    /**
+     *
+     * @param initializer
+     * @param keyExtractor
+     * @param valueExtractor
+     * @param finisher
+     * @param duplicateKeyMerger operation when duplicate key found
+     * @param <T>
+     * @param <V> Value type
+     * @return
+     */
+    static <T, V> Collector<T, JSONObject, JSONObject> toJSONObject(Supplier<JSONObject> initializer, Function<T, String> keyExtractor, Function<T, V> valueExtractor, Function<JSONObject, JSONObject> finisher, UnaryOperator<String> duplicateKeyMerger) {
         Objects.requireNonNull(initializer);
         Objects.requireNonNull(keyExtractor);
         Objects.requireNonNull(valueExtractor);
         Objects.requireNonNull(finisher);
+        Objects.requireNonNull(duplicateKeyMerger);
 
         return Collector.of(initializer, Try.onBiConsumer((jsonObject, t) -> {
             String key = keyExtractor.apply(t);
+
+            while(key != null && jsonObject.has(key)) {
+                String newKey = duplicateKeyMerger.apply(key);
+
+                // stop generating key if newKey is null or newKey equals key
+                if(newKey == null || newKey.equals(key)) {
+                    break;
+                }
+
+                key = newKey;
+            }
+
             V value = valueExtractor.apply(t);
 
             if (key != null && !key.isEmpty() && value != null) {
