@@ -9,7 +9,7 @@
     <url>https://github.com/kinnara-digital-studio/kinnara-commons/wiki</url>
     <groupId>com.kinnarastudio</groupId>
     <artifactId>kinnara-commons</artifactId>
-    <version>1.2.4</version>
+    <version>1.2.5</version>
 
     <build>
         <plugins>
