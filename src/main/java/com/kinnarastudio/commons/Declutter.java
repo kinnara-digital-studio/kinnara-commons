@@ -18,7 +18,7 @@ import java.util.stream.StreamSupport;
 /**
  * Mixin for stream processing
  */
-public interface Declutter extends Try {
+public interface Declutter {
     /**
      * Nullsafe. If string is null or empty
      *
@@ -27,7 +27,7 @@ public interface Declutter extends Try {
      */
     default boolean isEmpty(@Nullable Object value) {
         return Optional.ofNullable(value)
-                .map(tryFunction(String::valueOf))
+                .map(Try.onFunction(String::valueOf))
                 .map(String::isEmpty)
                 .orElse(true);
     }
@@ -236,7 +236,7 @@ public interface Declutter extends Try {
                 array.put(t);
             }
         }, (left, right) -> {
-            jsonStream(right).forEach(tryConsumer(left::put));
+            jsonStream(right).forEach(Try.onConsumer(left::put));
             return left;
         });
     }
@@ -258,7 +258,7 @@ public interface Declutter extends Try {
         Objects.requireNonNull(keyExtractor);
         Objects.requireNonNull(valueExtractor);
 
-        return Collector.of(JSONObject::new, tryBiConsumer((jsonObject, t) -> {
+        return Collector.of(JSONObject::new, Try.onBiConsumer((jsonObject, t) -> {
             String key = keyExtractor.apply(t);
             V value = valueExtractor.apply(t);
 
@@ -266,7 +266,7 @@ public interface Declutter extends Try {
                 jsonObject.put(key, value);
             }
         }), (left, right) -> {
-            jsonStream(right).forEach(tryConsumer(s -> left.put(s, right.get(s))));
+            jsonStream(right).forEach(Try.onConsumer(s -> left.put(s, right.get(s))));
             return left;
         });
     }
