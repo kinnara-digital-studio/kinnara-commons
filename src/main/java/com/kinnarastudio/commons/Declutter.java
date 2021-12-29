@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * Mixin for stream processing
+ * Mixin for simple processing
  */
 public interface Declutter {
     /**
