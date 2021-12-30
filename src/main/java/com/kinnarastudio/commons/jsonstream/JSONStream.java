@@ -66,8 +66,9 @@ public final class JSONStream {
     }
 
     /**
-     * Flatten deep {@link JSONObject} structure into simplified {@link JSONObjectEntry} structure.
-     * Array will be represented as [index]
+     * Flatten deep {@link JSONObject} structure into simplified {@link JSONObjectEntry} structure
+     * with path as entry's key
+     * Array's path will be represented as [index]
      *
      * @param jsonObject    source
      * @return
@@ -77,8 +78,9 @@ public final class JSONStream {
     }
 
     /**
-     * Flatten deep {@link JSONArray} structure into simplified {@link JSONObjectEntry} structure.
-     * Array will be represented as [index]
+     * Flatten deep {@link JSONArray} structure into simplified {@link JSONObjectEntry} structure
+     * with path as entry's key
+     * Array's path will be represented as [index]
      *
      * @param jsonArray     source
      * @return
@@ -133,7 +135,7 @@ public final class JSONStream {
 
     /**
      * Flatten deep {@link org.codehaus.jettison.json.JSONObject} structure into simplified {@link JSONObjectEntry} structure.
-     * Array will be represented as [index]
+     * Array's path will be represented as [index]
      *
      * @param jsonObject    source
      * @return
@@ -144,7 +146,7 @@ public final class JSONStream {
 
     /**
      * Flatten deep {@link org.codehaus.jettison.json.JSONArray} structure into simplified {@link JSONObjectEntry} structure.
-     * Array will be represented as [index]
+     * Array's path will be represented as [index]
      *
      * @param jsonArray     source
      * @return
