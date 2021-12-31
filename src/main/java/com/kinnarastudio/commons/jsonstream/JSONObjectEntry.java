@@ -4,6 +4,8 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 /**
+ * @author aristo
+ *
  * Entry for JSONObject
  *
  * @param <V> json value type

@@ -140,8 +140,8 @@ public final class JSONStream {
      * @param jsonObject    source
      * @return
      */
-    public static Stream<JSONObjectEntry<?>> flatten(final org.codehaus.jettison.json.JSONObject jsonObject) {
-        return flatten("", jsonObject);
+    public static Stream<JSONObjectEntry<?>> flattenAnotherJson(final org.codehaus.jettison.json.JSONObject jsonObject) {
+        return flattenAnotherJson("", jsonObject);
     }
 
     /**
@@ -151,8 +151,8 @@ public final class JSONStream {
      * @param jsonArray     source
      * @return
      */
-    public static Stream<JSONObjectEntry<?>> flatten(final org.codehaus.jettison.json.JSONArray jsonArray) {
-        return flatten("", jsonArray);
+    public static Stream<JSONObjectEntry<?>> flattenAnotherJson(final org.codehaus.jettison.json.JSONArray jsonArray) {
+        return flattenAnotherJson("", jsonArray);
     }
 
     /**
@@ -162,15 +162,15 @@ public final class JSONStream {
      * @param jsonObject    source
      * @return
      */
-    private static Stream<JSONObjectEntry<?>> flatten(final String path, final org.codehaus.jettison.json.JSONObject jsonObject) {
-        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonObject)), JSONStream.of(jsonObject, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)).flatMap(e -> {
+    private static Stream<JSONObjectEntry<?>> flattenAnotherJson(final String path, final org.codehaus.jettison.json.JSONObject jsonObject) {
+        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonObject)), JSONStream.ofAnotherJson(jsonObject, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)).flatMap(e -> {
             final String key = path.isEmpty() ? e.getKey() : String.join(".", path, e.getKey());
             final Object val = e.getValue();
 
             if (val instanceof org.codehaus.jettison.json.JSONObject) {
-                return flatten(key, (org.codehaus.jettison.json.JSONObject) val);
+                return flattenAnotherJson(key, (org.codehaus.jettison.json.JSONObject) val);
             } else if (val instanceof org.codehaus.jettison.json.JSONArray) {
-                return flatten(key, (org.codehaus.jettison.json.JSONArray) val);
+                return flattenAnotherJson(key, (org.codehaus.jettison.json.JSONArray) val);
             } else {
                 return Stream.of(new JSONObjectEntry<>(key, val));
             }
@@ -184,15 +184,15 @@ public final class JSONStream {
      * @param jsonArray     source
      * @return
      */
-    private static Stream<JSONObjectEntry<?>> flatten(final String path, final org.codehaus.jettison.json.JSONArray jsonArray) {
-        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonArray)), JSONStream.of(jsonArray, Try.onBiFunction((a, i) -> new JSONObjectEntry<>(String.valueOf(i), a.get(i))))
+    private static Stream<JSONObjectEntry<?>> flattenAnotherJson(final String path, final org.codehaus.jettison.json.JSONArray jsonArray) {
+        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonArray)), JSONStream.ofAnotherJson(jsonArray, Try.onBiFunction((a, i) -> new JSONObjectEntry<>(String.valueOf(i), a.get(i))))
                 .flatMap(e -> {
                     final String key = path + "[" + e.getKey() + "]";
                     final Object val = e.getValue();
                     if (val instanceof org.codehaus.jettison.json.JSONObject) {
-                        return flatten(key, (org.codehaus.jettison.json.JSONObject) val);
+                        return flattenAnotherJson(key, (org.codehaus.jettison.json.JSONObject) val);
                     } else if (val instanceof org.codehaus.jettison.json.JSONArray) {
-                        return flatten(key, (org.codehaus.jettison.json.JSONArray) val);
+                        return flattenAnotherJson(key, (org.codehaus.jettison.json.JSONArray) val);
                     } else {
                         return Stream.of(new JSONObjectEntry<>(key, val));
                     }
@@ -207,7 +207,7 @@ public final class JSONStream {
      * @param <V>
      * @return
      */
-    public static <V> Stream<JSONObjectEntry<V>> of(final org.codehaus.jettison.json.JSONObject jsonObject, final BiFunction<org.codehaus.jettison.json.JSONObject, String, V> valueExtractor) {
+    public static <V> Stream<JSONObjectEntry<V>> ofAnotherJson(final org.codehaus.jettison.json.JSONObject jsonObject, final BiFunction<org.codehaus.jettison.json.JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
 
         return Optional.ofNullable(jsonObject)
@@ -231,7 +231,7 @@ public final class JSONStream {
      * @param <V>
      * @return
      */
-    public static <V> Stream<V> of(final org.codehaus.jettison.json.JSONArray jsonArray, final BiFunction<org.codehaus.jettison.json.JSONArray, Integer, V> valueExtractor) {
+    public static <V> Stream<V> ofAnotherJson(final org.codehaus.jettison.json.JSONArray jsonArray, final BiFunction<org.codehaus.jettison.json.JSONArray, Integer, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
 
         int length = Optional.ofNullable(jsonArray)

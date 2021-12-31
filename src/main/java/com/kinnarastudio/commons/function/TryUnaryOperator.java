@@ -5,6 +5,14 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * @author aristo
+ *
+ * Try Unary Operator
+ *
+ * @param <T>
+ * @param <E>
+ */
 public interface TryUnaryOperator<T, E extends Exception> extends UnaryOperator<T> {
 
     T tryApply(T t) throws E;

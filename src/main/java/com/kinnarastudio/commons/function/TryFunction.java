@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * @author aristo
+ *
  * Throwable version of {@link Function}.
  * Returns null then exception is raised
  *

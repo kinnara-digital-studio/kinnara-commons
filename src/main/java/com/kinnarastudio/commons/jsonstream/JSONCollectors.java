@@ -11,6 +11,9 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
 /**
+ * @author aristo
+ *
+ * Json Collectors
  * Generate {@link Collector} for {@link JSONObject} and {@link JSONArray}
  */
 public final class JSONCollectors {
@@ -86,11 +89,7 @@ public final class JSONCollectors {
             if (key != null && !key.isEmpty() && value != null) {
                 jsonObject.put(key, value);
             }
-        }), (left, right) -> {
-            JSONStream.of(right, JSONObject::opt)
-                    .forEach(Try.onConsumer(e -> left.put(e.getKey(), right.opt(e.getKey()))));
-            return left;
-        }, finisher);
+        }), JSONMapper::combine, finisher);
     }
 
     /**
@@ -133,14 +132,11 @@ public final class JSONCollectors {
         Objects.requireNonNull(finisher);
 
         return Collector.of(initializer, (array, t) -> {
-            V value = valueExtractor.apply(t);
+            final V value = valueExtractor.apply(t);
             if (value != null) {
                 array.put(value);
             }
-        }, (left, right) -> {
-            JSONStream.of(right, JSONArray::opt).forEach(Try.onConsumer(left::put));
-            return left;
-        }, finisher);
+        }, JSONMapper::concat, finisher);
     }
 
     /**
@@ -215,11 +211,7 @@ public final class JSONCollectors {
             if (key != null && !key.isEmpty() && value != null) {
                 jsonObject.put(key, value);
             }
-        }), (left, right) -> {
-            JSONStream.of(right, org.codehaus.jettison.json.JSONObject::opt)
-                    .forEach(Try.onConsumer(e -> left.put(e.getKey(), right.opt(e.getKey()))));
-            return left;
-        }, finisher);
+        }), JSONMapper::combine, finisher);
     }
 
 
@@ -264,13 +256,10 @@ public final class JSONCollectors {
         Objects.requireNonNull(finisher);
 
         return Collector.of(initializer, (array, t) -> {
-            V value = valueExtractor.apply(t);
+            final V value = valueExtractor.apply(t);
             if (value != null) {
                 array.put(value);
             }
-        }, (left, right) -> {
-            JSONStream.of(right, org.codehaus.jettison.json.JSONArray::opt).forEach(Try.onConsumer(left::put));
-            return left;
-        }, finisher);
+        }, JSONMapper::concat, finisher);
     }
 }

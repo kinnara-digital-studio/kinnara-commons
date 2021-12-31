@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * @author aristo
+ *
  * Throwable BiFunction
  *
  * @param <T>

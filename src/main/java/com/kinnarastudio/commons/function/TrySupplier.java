@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * @author aristo
+ *
  * Throwable version of {@link Supplier}
  *
  * @param <R>

@@ -8,6 +8,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * @author aristo
+ *
+ * Json Mapper
+ */
 public final class JSONMapper {
     public static <T, V> Function<T, JSONObject> toJSONObject(Function<T, String> keyExtractor, Function<T, V> valueExtractor) {
         return Try.onFunction((t) -> {
@@ -17,7 +22,7 @@ public final class JSONMapper {
             String key = keyExtractor.apply(t);
             V value = valueExtractor.apply(t);
 
-            JSONObject jsonObject =  new JSONObject();
+            JSONObject jsonObject = new JSONObject();
             jsonObject.put(key, value);
             return jsonObject;
         });
@@ -57,7 +62,7 @@ public final class JSONMapper {
      */
     public static org.codehaus.jettison.json.JSONArray concat(org.codehaus.jettison.json.JSONArray array1, org.codehaus.jettison.json.JSONArray array2) {
         return Stream
-                .concat(JSONStream.of(array1, Try.onBiFunction(org.codehaus.jettison.json.JSONArray::get)), JSONStream.of(array2, Try.onBiFunction(org.codehaus.jettison.json.JSONArray::get)))
+                .concat(JSONStream.ofAnotherJson(array1, Try.onBiFunction(org.codehaus.jettison.json.JSONArray::get)), JSONStream.ofAnotherJson(array2, Try.onBiFunction(org.codehaus.jettison.json.JSONArray::get)))
                 .collect(JSONCollectors.toAnotherJSONArray());
     }
 
@@ -69,7 +74,7 @@ public final class JSONMapper {
      * @return
      */
     public static org.codehaus.jettison.json.JSONObject combine(org.codehaus.jettison.json.JSONObject object1, org.codehaus.jettison.json.JSONObject object2) {
-        return Stream.concat(JSONStream.of(object1, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)), JSONStream.of(object2, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)))
+        return Stream.concat(JSONStream.ofAnotherJson(object1, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)), JSONStream.ofAnotherJson(object2, Try.onBiFunction(org.codehaus.jettison.json.JSONObject::get)))
                 .collect(JSONCollectors.toAnotherJSONObject(JSONObjectEntry::getKey, JSONObjectEntry::getValue));
     }
 }
