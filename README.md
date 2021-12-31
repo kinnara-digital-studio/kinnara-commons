@@ -40,3 +40,25 @@ class Yourclass implements com.kinnarastudio.commons.Declutter {
 #### Throwable Predicate ####
 
 #### Throwable Supplier ####
+
+### Stream APIs ###
+
+#### JSONStream ####
+
+Create a `java.util.Stream` instance of json
+
+#### JSONCollectors ####
+
+Collect `java.util.Stream` into json object or json array 
+
+#### JSONMapper ####
+
+### Change Log ###
+
+#### 2.2.0 ####
+
+- Support for package `org.codehaus.jettison`
+
+#### 2.0.0 ####
+
+- Add `flatten` methods in `JSONStream`
