@@ -1,10 +1,10 @@
 # Declutter
 
-### Description ###
+### Description
 Decluttering JAVA 8 lamda programing and stream API
 
-
-### Example ###
+### How to build
+### Example
 ```
 class Yourclass implements com.kinnarastudio.commons.Declutter {
     public yourMethod() {
@@ -54,8 +54,11 @@ Collect `java.util.Stream` into json object or json array
 #### JSONMapper ####
 
 ### Change Log ###
+#### 3.0.0
 
-#### 2.2.0 ####
+- Remove implementation of `org.codehaus.jettison`
+
+#### 2.2.0
 
 - Support for package `org.codehaus.jettison`
 
