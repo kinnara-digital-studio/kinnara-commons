@@ -51,6 +51,8 @@ public final class Try {
     }
 
     /**
+     * Try on consumer
+     *
      * @param consumer
      * @param <T>
      * @param <E>
@@ -61,6 +63,8 @@ public final class Try {
     }
 
     /**
+     * Try on consumer
+     *
      * @param consumer
      * @param failover
      * @param <T>
@@ -72,6 +76,8 @@ public final class Try {
     }
 
     /**
+     * Try on consumer
+     *
      * @param consumer
      * @param failover
      * @param <T>
@@ -83,6 +89,8 @@ public final class Try {
     }
 
     /**
+     * Try on bi-consumer
+     *
      * @param biConsumer
      * @param <T>
      * @param <U>
@@ -94,6 +102,8 @@ public final class Try {
     }
 
     /**
+     * Try on unary operator
+     *
      * @param tryUnaryOperator
      * @param <T>
      * @param <E>
@@ -104,6 +114,8 @@ public final class Try {
     }
 
     /**
+     * Try on unary operator
+     *
      * @param tryUnaryOperator
      * @param failover
      * @param <T>
@@ -115,6 +127,8 @@ public final class Try {
     }
 
     /**
+     * Try on function
+     *
      * @param tryFunction
      * @param <T>
      * @param <R>
@@ -126,6 +140,8 @@ public final class Try {
     }
 
     /**
+     * Try on function
+     *
      * @param tryFunction
      * @param failover
      * @param <T>
@@ -138,6 +154,8 @@ public final class Try {
     }
 
     /**
+     * Try on function
+     *
      * @param tryFunction
      * @param failover
      * @param <T>
@@ -150,6 +168,8 @@ public final class Try {
     }
 
     /**
+     * Try on bi-function
+     *
      * @param tryBiFunction
      * @param <T>
      * @param <U>
@@ -162,6 +182,8 @@ public final class Try {
     }
 
     /**
+     * Try on bi-function
+     *
      * @param tryBiFunction
      * @param failover
      * @param <T>
@@ -175,6 +197,8 @@ public final class Try {
     }
 
     /**
+     * Try on predicate
+     *
      * @param tryComparator
      * @param <T>
      * @param <E>
@@ -185,6 +209,8 @@ public final class Try {
     }
 
     /**
+     * Try on predicate
+     *
      * @param tryComparator
      * @param failover
      * @param <T>
@@ -196,6 +222,8 @@ public final class Try {
     }
 
     /**
+     * Try on predicate
+     *
      * @param tryPredicate
      * @param <T>
      * @param <E>
@@ -206,6 +234,8 @@ public final class Try {
     }
 
     /**
+     * Try on predicate
+     *
      * @param tryPredicate
      * @param failover
      * @param <T>
@@ -217,6 +247,8 @@ public final class Try {
     }
 
     /**
+     * Try on predicate
+     *
      * @param tryPredicate
      * @param failover
      * @param <T>
@@ -225,6 +257,44 @@ public final class Try {
      */
     public static <T, E extends Exception> Predicate<T> onPredicate(TryPredicate<T, E> tryPredicate, BiPredicate<T, E> failover) {
         return tryPredicate.onCatch(failover);
+    }
+
+    /**
+     * Try to negate on predicate
+     *
+     * @param tryPredicate
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    public static <T, E extends Exception> Predicate<T> toNegate(TryPredicate<T, E> tryPredicate) {
+        return tryPredicate.negate();
+    }
+
+    /**
+     * Try to negate on predicate
+     *
+     * @param tryPredicate
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    public static <T, E extends Exception> Predicate<T> toNegate(TryPredicate<T, E> tryPredicate, Predicate<E> failover) {
+        return tryPredicate.onCatch(failover).negate();
+    }
+
+    /**
+     * Try to negate on predicate
+     *
+     * @param tryPredicate
+     * @param failover
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    public static <T, E extends Exception> Predicate<T> toNegate(TryPredicate<T, E> tryPredicate, BiPredicate<T, E> failover) {
+        return tryPredicate.onCatch(failover).negate();
     }
 
     /**

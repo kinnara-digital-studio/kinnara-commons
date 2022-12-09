@@ -54,6 +54,11 @@ Collect `java.util.Stream` into json object or json array
 #### JSONMapper ####
 
 ### Change Log ###
+
+#### 3.1.0
+
+- Add implementation of `Try.onNegate` 
+
 #### 3.0.0
 
 - Remove implementation of `org.codehaus.jettison`
