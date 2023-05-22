@@ -28,26 +28,26 @@ public interface TryConsumer<T, E extends Exception> extends Consumer<T> {
         }
     }
 
-    default Consumer<T> onCatch(final Consumer<? super E> consumer) {
-        Objects.requireNonNull(consumer);
+    default Consumer<T> onCatch(final Consumer<? super E> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return t -> {
             try {
                 tryAccept(t);
             } catch (Exception e) {
-                consumer.accept((E) e);
+                onCatch.accept((E) e);
             }
         };
     }
 
-    default Consumer<T> onCatch(BiConsumer<T, ? super E> biConsumer) {
-        Objects.requireNonNull(biConsumer);
+    default Consumer<T> onCatch(BiConsumer<T, ? super E> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return t -> {
             try {
                 tryAccept(t);
             } catch (Exception e) {
-                biConsumer.accept(t, (E)e);
+                onCatch.accept(t, (E)e);
             }
         };
     }

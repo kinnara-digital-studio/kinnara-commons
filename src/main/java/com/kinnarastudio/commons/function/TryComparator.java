@@ -26,14 +26,14 @@ public interface TryComparator<T, E extends Exception> extends Comparator<T> {
         }
     }
 
-    default Comparator<T> onCatch(Function<E, Integer> function) {
-        Objects.requireNonNull(function);
+    default Comparator<T> onCatch(Function<E, Integer> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return (T o1, T o2) -> {
             try {
                 return tryCompare(o1, o2);
             } catch (Exception e) {
-                return function.apply((E) e);
+                return onCatch.apply((E) e);
             }
         };
     }

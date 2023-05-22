@@ -38,4 +38,15 @@ public interface TryBiConsumer<T, U, E extends Exception> extends BiConsumer<T, 
             }
         };
     }
+
+    default BiConsumer<T, U> onCatch(TriConsumer<T, U, ? super E> consumer) {
+        Objects.requireNonNull(consumer);
+        return (t, u) -> {
+            try {
+                tryAccept(t, u);
+            } catch (Exception e) {
+                consumer.accept(t, u, (E)e);
+            }
+        };
+    }
 }

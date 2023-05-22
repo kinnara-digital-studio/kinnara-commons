@@ -23,12 +23,12 @@ public interface TryRunnable<E extends Exception> extends Runnable {
         }
     }
 
-    default Runnable onCatch(Consumer<E> consumer) {
+    default Runnable onCatch(Consumer<? super E> onCatch) {
         return () -> {
             try {
                 tryRun();
             } catch (Exception e) {
-                consumer.accept((E) e);
+                onCatch.accept((E) e);
             }
         };
     }

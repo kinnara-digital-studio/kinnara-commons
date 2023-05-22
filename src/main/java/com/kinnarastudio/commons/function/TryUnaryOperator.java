@@ -1,5 +1,6 @@
 package com.kinnarastudio.commons.function;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.logging.Level;
@@ -28,15 +29,30 @@ public interface TryUnaryOperator<T, E extends Exception> extends UnaryOperator<
     }
 
     /**
-     * @param f
+     * @param onCatch
      * @return
      */
-    default UnaryOperator<T> onCatch(Function<? super E, ? extends T> f) {
+    default UnaryOperator<T> onCatch(Function<? super E, ? extends T> onCatch) {
         return t -> {
             try {
                 return (T) tryApply(t);
             } catch (Exception e) {
-                return f.apply((E) e);
+                return onCatch.apply((E) e);
+            }
+        };
+    }
+
+    /**
+     *
+     * @param onCatch
+     * @return
+     */
+    default UnaryOperator<T> onCatch(BiFunction<T, ? super E, ? extends T> onCatch) {
+        return t -> {
+            try {
+                return (T) tryApply(t);
+            } catch (Exception e) {
+                return onCatch.apply(t, (E) e);
             }
         };
     }

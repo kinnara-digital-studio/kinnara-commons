@@ -5,9 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.stream.Collector;
 
 /**
@@ -50,7 +48,23 @@ public final class JSONCollectors {
      * @return
      */
     public static <T, V> Collector<T, JSONObject, JSONObject> toJSONObject(Supplier<JSONObject> initializer, Function<T, String> keyExtractor, Function<T, V> valueExtractor, Function<JSONObject, JSONObject> finisher) {
-        return toJSONObject(initializer, keyExtractor, valueExtractor, finisher, s -> null);
+        return toJSONObject(initializer, keyExtractor, valueExtractor, JSONMapper::combine, finisher);
+    }
+
+    /**
+     *
+     * @param initializer
+     * @param keyExtractor
+     * @param valueExtractor
+     * @param combiner
+     * @param finisher
+     * @return
+     * @param <T>
+     * @param <V>
+     */
+    public static <T, V> Collector<T, JSONObject, JSONObject> toJSONObject(Supplier<JSONObject> initializer, Function<T, String> keyExtractor, Function<T, V> valueExtractor, BinaryOperator<JSONObject> combiner, Function<JSONObject, JSONObject> finisher) {
+        final JSONObjectCollector<JSONObject> collector = new JSONObjectCollector<>(initializer, Try.onTriConsumer(JSONObject::put));
+        return collector.toJSON(keyExtractor, valueExtractor, combiner, finisher);
     }
 
     /**
@@ -59,7 +73,7 @@ public final class JSONCollectors {
      * @param valueExtractor
      * @param finisher
      * @param duplicateKeyMerger operation when duplicate key found
-     * @param <T>
+     * @param <T>UnaryOperator<String> duplicateKeyMerger
      * @param <V>                Value type
      * @return
      */
@@ -70,10 +84,10 @@ public final class JSONCollectors {
         Objects.requireNonNull(finisher);
         Objects.requireNonNull(duplicateKeyMerger);
 
-        return Collector.of(initializer, Try.onBiConsumer((jsonObject, t) -> {
+        return Collector.of(initializer, Try.onBiConsumer((json, t) -> {
             String key = keyExtractor.apply(t);
 
-            while (key != null && jsonObject.has(key)) {
+            while (key != null && json.has(key)) {
                 String newKey = duplicateKeyMerger.apply(key);
 
                 // stop generating key if newKey is null or newKey equals key
@@ -87,7 +101,7 @@ public final class JSONCollectors {
             V value = valueExtractor.apply(t);
 
             if (key != null && !key.isEmpty() && value != null) {
-                jsonObject.put(key, value);
+                json.put(key, value);
             }
         }), JSONMapper::combine, finisher);
     }
@@ -127,15 +141,7 @@ public final class JSONCollectors {
      * @return
      */
     public static <T, V> Collector<T, JSONArray, JSONArray> toJSONArray(Supplier<JSONArray> initializer, Function<T, V> valueExtractor, Function<JSONArray, JSONArray> finisher) {
-        Objects.requireNonNull(initializer);
-        Objects.requireNonNull(valueExtractor);
-        Objects.requireNonNull(finisher);
-
-        return Collector.of(initializer, (array, t) -> {
-            final V value = valueExtractor.apply(t);
-            if (value != null) {
-                array.put(value);
-            }
-        }, JSONMapper::concat, finisher);
+        final JSONArrayCollector<JSONArray> collector = new JSONArrayCollector<>(initializer, JSONArray::put);
+        return collector.toJSON(valueExtractor, JSONMapper::concat, finisher);
     }
 }

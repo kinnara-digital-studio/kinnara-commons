@@ -28,12 +28,12 @@ public final class JSONMapper {
     /**
      * Combine {@link JSONObject}s
      *
-     * @param object1
-     * @param object2
+     * @param left
+     * @param right
      * @return
      */
-    public static JSONObject combine(JSONObject object1, JSONObject object2) {
-        return Stream.concat(JSONStream.of(object1, Try.onBiFunction(JSONObject::get)), JSONStream.of(object2, Try.onBiFunction(JSONObject::get)))
+    public static JSONObject combine(JSONObject left, JSONObject right) {
+        return Stream.concat(JSONStream.of(left, Try.onBiFunction(JSONObject::get)), JSONStream.of(right, Try.onBiFunction(JSONObject::get)))
                 .collect(JSONCollectors.toJSONObject(JSONObjectEntry::getKey, JSONObjectEntry::getValue));
     }
 }

@@ -102,6 +102,61 @@ public final class Try {
     }
 
     /**
+     * Try on bi-consumer
+     *
+     * @param biConsumer
+     * @param <T>
+     * @param <U>
+     * @param <E>
+     * @param failover
+     * @return
+     */
+    public static <T, U, E extends Exception> BiConsumer<T, U> onBiConsumer(TryBiConsumer<T, U, ? extends E> biConsumer, Consumer<? super E> failover) {
+        return biConsumer.onCatch(failover);
+    }
+
+    /**
+     * Try on bi-consumer
+     *
+     * @param biConsumer
+     * @param <T>
+     * @param <U>
+     * @param <E>
+     * @param failover
+     * @return
+     */
+    public static <T, U, E extends Exception> BiConsumer<T, U> onBiConsumer(TryBiConsumer<T, U, ? extends E> biConsumer, TriConsumer<T, U, ? super E> failover) {
+        return biConsumer.onCatch(failover);
+    }
+
+    /**
+     *
+     * @param triConsumer
+     * @return
+     * @param <T>
+     * @param <U>
+     * @param <V>
+     * @param <E>
+     */
+    public static <T, U, V, E extends Exception> TriConsumer<T, U, V> onTriConsumer(TryTriConsumer<T, U, V, E> triConsumer) {
+        return triConsumer;
+    }
+
+    /**
+     *
+     * @param triConsumer
+     * @param failover
+     * @return
+     * @param <T>
+     * @param <U>
+     * @param <V>
+     * @param <E>
+     */
+    public static <T, U, V, E extends Exception> TriConsumer<T, U, V> onTriConsumer(TryTriConsumer<T, U, V, E> triConsumer, Consumer<? super E> failover) {
+        return triConsumer.onCatch(failover);
+    }
+
+    /**
      * Try on unary operator
      *
      * @param tryUnaryOperator
@@ -314,5 +369,20 @@ public final class Try {
      */
     public static <E extends Exception> Runnable onRunnable(TryRunnable<E> tryRunnable, Consumer<E> failover) {
         return tryRunnable.onCatch(failover);
+    }
+
+    /**
+     * Try to peek on function
+     *
+     * @param tryConsumer
+     * @param <T>
+     * @param <E>
+     * @return
+     */
+    public static <T, E extends Exception> Function<T, T> toPeek(TryConsumer<T, ? extends E> tryConsumer) {
+        return t -> {
+            tryConsumer.accept(t);
+            return t;
+        };
     }
 }

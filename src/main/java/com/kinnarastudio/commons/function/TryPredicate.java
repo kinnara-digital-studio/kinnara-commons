@@ -29,26 +29,26 @@ public interface TryPredicate<T, E extends Exception> extends Predicate<T> {
         }
     }
 
-    default Predicate<T> onCatch(Predicate<? super E> predicate) {
-        Objects.requireNonNull(predicate);
+    default Predicate<T> onCatch(Predicate<? super E> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return t -> {
             try {
                 return tryTest(t);
             } catch (Exception e) {
-                return predicate.test((E)e);
+                return onCatch.test((E)e);
             }
         };
     }
 
-    default Predicate<T> onCatch(BiPredicate<T, ? super E> biPredicate) {
-        Objects.requireNonNull(biPredicate);
+    default Predicate<T> onCatch(BiPredicate<T, ? super E> onCatch) {
+        Objects.requireNonNull(onCatch);
 
         return t -> {
             try {
                 return tryTest(t);
             } catch (Exception e) {
-                return biPredicate.test(t, (E)e);
+                return onCatch.test(t, (E)e);
             }
         };
     }

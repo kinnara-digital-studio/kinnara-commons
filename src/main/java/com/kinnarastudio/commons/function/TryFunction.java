@@ -30,29 +30,29 @@ public interface TryFunction<T, R, E extends Exception> extends Function<T, R> {
     }
 
     /**
-     * @param f
+     * @param onCatch
      * @return
      */
-    default Function<T, R> onCatch(Function<? super E, ? extends R> f) {
+    default Function<T, R> onCatch(Function<? super E, ? extends R> onCatch) {
         return t -> {
             try {
                 return (R) tryApply(t);
             } catch (Exception e) {
-                return f.apply((E) e);
+                return onCatch.apply((E) e);
             }
         };
     }
 
     /**
-     * @param f
+     * @param onCatch
      * @return
      */
-    default Function<T, R> onCatch(BiFunction<? super T, ? super E, ? extends R> f) {
+    default Function<T, R> onCatch(BiFunction<? super T, ? super E, ? extends R> onCatch) {
         return t -> {
             try {
                 return (R) tryApply(t);
             } catch (Exception e) {
-                return f.apply(t, (E) e);
+                return onCatch.apply(t, (E) e);
             }
         };
     }

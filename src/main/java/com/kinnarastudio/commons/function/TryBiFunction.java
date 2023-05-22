@@ -28,12 +28,12 @@ public interface TryBiFunction<T, U, R, E extends Exception> extends BiFunction<
         }
     }
 
-    default BiFunction<T, U, R> onCatch(Function<E, R> function) {
+    default BiFunction<T, U, R> onCatch(Function<E, R> onCatch) {
         return (t, u) -> {
             try {
                 return tryApply(t, u);
             } catch (Exception e) {
-                return function.apply((E) e);
+                return onCatch.apply((E) e);
             }
         };
     }
