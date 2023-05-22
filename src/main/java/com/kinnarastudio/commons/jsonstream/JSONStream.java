@@ -1,12 +1,19 @@
 package com.kinnarastudio.commons.jsonstream;
 
 import com.kinnarastudio.commons.Try;
+import com.kinnarastudio.commons.jsonstream.adapter.JsonArrayStreamerAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.JsonObjectStreamerAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Spliterators;
 import java.util.function.BiFunction;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author aristo
@@ -27,8 +34,45 @@ public final class JSONStream {
     public static <V> Stream<JSONObjectEntry<V>> of(final JSONObject jsonObject, final BiFunction<JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
 
-        final JSONObjectStreamer<JSONObject> streamer = new JSONObjectStreamer<>(JSONObject::keys);
-        return streamer.of(jsonObject, valueExtractor);
+        final JsonObjectStreamerAdapter<JSONObject, V> adapter = new JsonObjectStreamerAdapter<JSONObject, V>() {
+            @Override
+            public Iterator<String> getKeyIterator(JSONObject jsonObject) {
+                return jsonObject.keys();
+            }
+
+            @Override
+            public V getValue(JSONObject jsonObject, String key) {
+                return valueExtractor.apply(jsonObject, key);
+            }
+
+        };
+
+        return of(jsonObject, adapter);
+    }
+
+    /**
+     *
+     * @param jsonObject
+     * @param adapter
+     * @return
+     * @param <JSON>
+     * @param <V>
+     */
+    public static <JSON, V> Stream<JSONObjectEntry<V>> of(final JSON jsonObject, final JsonObjectStreamerAdapter<JSON, V> adapter) {
+        Objects.requireNonNull(adapter);
+
+        return Optional.ofNullable(jsonObject)
+                .map(j -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(adapter.getKeyIterator(j), 0), false))
+                .orElseGet(Stream::empty)
+                .map(key -> {
+                    final V value = adapter.getValue(jsonObject, key);
+                    if (value != null) {
+                        return new JSONObjectEntry<>(key, value);
+                    }
+
+                    return null;
+                })
+                .filter(Objects::nonNull);
     }
 
     /**
@@ -42,8 +86,40 @@ public final class JSONStream {
     public static <V> Stream<V> of(final JSONArray jsonArray, final BiFunction<JSONArray, Integer, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
 
-        final JSONArrayStreamer<JSONArray> streamer = new JSONArrayStreamer<>(JSONArray::length);
-        return streamer.of(jsonArray, valueExtractor);
+        final JsonArrayStreamerAdapter<JSONArray, V> adapter = new JsonArrayStreamerAdapter<JSONArray, V>() {
+            @Override
+            public int getLength(JSONArray json) {
+                return json.length();
+            }
+
+            @Override
+            public V getValue(JSONArray jsonArray, int index) {
+                return valueExtractor.apply(jsonArray, index);
+            }
+        };
+
+        return of(jsonArray, adapter);
+    }
+
+    /**
+     *
+     * @param jsonArray
+     * @param adapter
+     * @return
+     * @param <JSON>
+     * @param <V>
+     */
+    public static <JSON, V> Stream<V> of(final JSON jsonArray, final JsonArrayStreamerAdapter<JSON, V> adapter) {
+        Objects.requireNonNull(adapter);
+
+        int length = Optional.ofNullable(jsonArray)
+                .map(adapter::getLength)
+                .orElse(0);
+
+        return IntStream.iterate(0, i -> i + 1).limit(length)
+                .boxed()
+                .map(i -> adapter.getValue(jsonArray, i))
+                .filter(Objects::nonNull);
     }
 
     /**
