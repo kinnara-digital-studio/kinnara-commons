@@ -1,12 +1,15 @@
 package com.kinnarastudio.commons.jsonstream;
 
 import com.kinnarastudio.commons.Try;
-import com.kinnarastudio.commons.jsonstream.adapter.JsonArrayStreamerAdapter;
-import com.kinnarastudio.commons.jsonstream.adapter.JsonObjectStreamerAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.ArrayAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.ObjectAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONObjectAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonArrayAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONArrayAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonObjectAdapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterators;
@@ -18,47 +21,21 @@ import java.util.stream.StreamSupport;
 /**
  * @author aristo
  *
- * Stream into {@link JSONObject} or {@link JSONArray}
+ * Streamer of json object and json array
  *
  */
 public final class JSONStream {
 
     /**
-     * Stream direct children of {@link JSONObject}
+     * Streamer for json object
      *
-     * @param jsonObject        source
-     * @param valueExtractor    extractor
-     * @param <V>
-     * @return
-     */
-    public static <V> Stream<JSONObjectEntry<V>> of(final JSONObject jsonObject, final BiFunction<JSONObject, String, V> valueExtractor) {
-        Objects.requireNonNull(valueExtractor);
-
-        final JsonObjectStreamerAdapter<JSONObject, V> adapter = new JsonObjectStreamerAdapter<JSONObject, V>() {
-            @Override
-            public Iterator<String> getKeyIterator(JSONObject jsonObject) {
-                return jsonObject.keys();
-            }
-
-            @Override
-            public V getValue(JSONObject jsonObject, String key) {
-                return valueExtractor.apply(jsonObject, key);
-            }
-
-        };
-
-        return of(jsonObject, adapter);
-    }
-
-    /**
-     *
-     * @param jsonObject
      * @param adapter
+     * @param jsonObject
      * @return
-     * @param <JSON>
-     * @param <V>
+     * @param <J> Json object class
+     * @param <V> Json object value type
      */
-    public static <JSON, V> Stream<JSONObjectEntry<V>> of(final JSON jsonObject, final JsonObjectStreamerAdapter<JSON, V> adapter) {
+    public static <J, V> Stream<JSONObjectEntry<V>> of(final ObjectAdapter<J> adapter, final J jsonObject) {
         Objects.requireNonNull(adapter);
 
         return Optional.ofNullable(jsonObject)
@@ -76,40 +53,57 @@ public final class JSONStream {
     }
 
     /**
-     * Stream direct children of {@link JSONArray}
+     * Streamer for {@link JSONObject}
      *
-     * @param jsonArray         source
-     * @param valueExtractor    extractor
-     * @param <V>
+     * @param jsonObject
+     * @param valueExtractor
      * @return
+     * @param <V> Json object value type
      */
-    public static <V> Stream<V> of(final JSONArray jsonArray, final BiFunction<JSONArray, Integer, V> valueExtractor) {
+    public static <V> Stream<JSONObjectEntry<V>> of(final JSONObject jsonObject, final BiFunction<JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
 
-        final JsonArrayStreamerAdapter<JSONArray, V> adapter = new JsonArrayStreamerAdapter<JSONArray, V>() {
+        final JSONObjectAdapter adapter = new JSONObjectAdapter() {
             @Override
-            public int getLength(JSONArray json) {
-                return json.length();
-            }
-
-            @Override
-            public V getValue(JSONArray jsonArray, int index) {
-                return valueExtractor.apply(jsonArray, index);
+            public V getValue(JSONObject json, String key) {
+                return valueExtractor.apply(json, key);
             }
         };
 
-        return of(jsonArray, adapter);
+        return of(adapter, jsonObject);
     }
 
     /**
+     * Streamer for {@link org.codehaus.jettison.json.JSONArray}
+     *
+     * @param jsonObject
+     * @param valueExtractor
+     * @return
+     * @param <V> Json object value type
+     */
+    public static <V> Stream<JSONObjectEntry<V>> of(final org.codehaus.jettison.json.JSONObject jsonObject, final BiFunction<org.codehaus.jettison.json.JSONObject, String, V> valueExtractor) {
+        Objects.requireNonNull(valueExtractor);
+
+        final JettisonObjectAdapter adapter = new JettisonObjectAdapter() {
+            @Override
+            public <V> V getValue(org.codehaus.jettison.json.JSONObject json, String key) {
+                return (V) valueExtractor.apply(json, key);
+            }
+        };
+
+        return of(adapter, jsonObject);
+    }
+
+    /**
+     * Streamer for json array
      *
      * @param jsonArray
      * @param adapter
      * @return
-     * @param <JSON>
-     * @param <V>
+     * @param <J> Json array class
+     * @param <V> Json array content type
      */
-    public static <JSON, V> Stream<V> of(final JSON jsonArray, final JsonArrayStreamerAdapter<JSON, V> adapter) {
+    public static <J, V> Stream<V> of(final ArrayAdapter<J, V> adapter, final J jsonArray) {
         Objects.requireNonNull(adapter);
 
         int length = Optional.ofNullable(jsonArray)
@@ -120,6 +114,31 @@ public final class JSONStream {
                 .boxed()
                 .map(i -> adapter.getValue(jsonArray, i))
                 .filter(Objects::nonNull);
+    }
+
+    /**
+     * Streamer for {@link JSONArray}
+     *
+     * @param jsonArray      Source json array
+     * @param valueExtractor Value extractor from json array
+     * @return
+     * @param <V> Json array content type
+     */
+    public static <V> Stream<V> of(final JSONArray jsonArray, final BiFunction<JSONArray, Integer, V> valueExtractor) {
+        final JSONArrayAdapter<V> adapter = new JSONArrayAdapter<>(valueExtractor);
+        return of(adapter, jsonArray);
+    }
+
+    /**
+     *
+     * @param jsonArray
+     * @param valueExtractor
+     * @return
+     * @param <V> Json array content type
+     */
+    public static <V> Stream<V> of(final org.codehaus.jettison.json.JSONArray jsonArray, final BiFunction<org.codehaus.jettison.json.JSONArray, Integer, V> valueExtractor) {
+        final JettisonArrayAdapter<V> adapter = new JettisonArrayAdapter<>(valueExtractor);
+        return of(adapter, jsonArray);
     }
 
     /**

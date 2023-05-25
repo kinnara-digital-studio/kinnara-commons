@@ -5,18 +5,20 @@ import java.util.Iterator;
 /**
  * Adapter for Json Object
  *
- * @param <JSON>    Json Object class
- * @param <VALUE>   Value type to be extracted
+ * @param <J>    Json Object class
  */
-public interface JsonObjectStreamerAdapter<JSON, VALUE> {
+public interface ObjectAdapter<J> {
+    J initialize();
+
     /**
      * Get key iterator for jsonObject object
      *
      * @param jsonObject
      * @return
      */
-    Iterator<String> getKeyIterator(JSON jsonObject);
+    Iterator<String> getKeyIterator(J jsonObject);
 
+    boolean objectHasKey(J json, String key);
     /**
      * Get value of particular key
      *
@@ -24,5 +26,7 @@ public interface JsonObjectStreamerAdapter<JSON, VALUE> {
      * @param key
      * @return
      */
-    VALUE getValue(JSON json, String key);
+    <V> V getValue(J json, String key);
+
+    <V> void putValue(J json, String key, V value);
 }
