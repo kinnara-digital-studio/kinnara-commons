@@ -35,7 +35,7 @@ public final class JSONStream {
      * @param <J> Json object class
      * @param <V> Json object value type
      */
-    public static <J, V> Stream<JSONObjectEntry<V>> of(final ObjectAdapter<J> adapter, final J jsonObject) {
+    public static <J, V> Stream<JSONObjectEntry<V>> of(final ObjectAdapter<J, V> adapter, final J jsonObject) {
         Objects.requireNonNull(adapter);
 
         return Optional.ofNullable(jsonObject)
@@ -62,14 +62,7 @@ public final class JSONStream {
      */
     public static <V> Stream<JSONObjectEntry<V>> of(final JSONObject jsonObject, final BiFunction<JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
-
-        final JSONObjectAdapter adapter = new JSONObjectAdapter() {
-            @Override
-            public V getValue(JSONObject json, String key) {
-                return valueExtractor.apply(json, key);
-            }
-        };
-
+        final JSONObjectAdapter<V> adapter = new JSONObjectAdapter<>(valueExtractor);
         return of(adapter, jsonObject);
     }
 
@@ -83,14 +76,7 @@ public final class JSONStream {
      */
     public static <V> Stream<JSONObjectEntry<V>> of(final org.codehaus.jettison.json.JSONObject jsonObject, final BiFunction<org.codehaus.jettison.json.JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
-
-        final JettisonObjectAdapter adapter = new JettisonObjectAdapter() {
-            @Override
-            public <V> V getValue(org.codehaus.jettison.json.JSONObject json, String key) {
-                return (V) valueExtractor.apply(json, key);
-            }
-        };
-
+        final JettisonObjectAdapter<V> adapter = new JettisonObjectAdapter<>();
         return of(adapter, jsonObject);
     }
 
@@ -125,6 +111,7 @@ public final class JSONStream {
      * @param <V> Json array content type
      */
     public static <V> Stream<V> of(final JSONArray jsonArray, final BiFunction<JSONArray, Integer, V> valueExtractor) {
+        Objects.requireNonNull(valueExtractor);
         final JSONArrayAdapter<V> adapter = new JSONArrayAdapter<>(valueExtractor);
         return of(adapter, jsonArray);
     }
@@ -137,6 +124,7 @@ public final class JSONStream {
      * @param <V> Json array content type
      */
     public static <V> Stream<V> of(final org.codehaus.jettison.json.JSONArray jsonArray, final BiFunction<org.codehaus.jettison.json.JSONArray, Integer, V> valueExtractor) {
+        Objects.requireNonNull(valueExtractor);
         final JettisonArrayAdapter<V> adapter = new JettisonArrayAdapter<>(valueExtractor);
         return of(adapter, jsonArray);
     }

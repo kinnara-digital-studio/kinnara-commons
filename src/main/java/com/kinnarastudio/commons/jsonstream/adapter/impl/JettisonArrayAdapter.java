@@ -4,6 +4,7 @@ import com.kinnarastudio.commons.Try;
 import com.kinnarastudio.commons.jsonstream.adapter.ArrayAdapter;
 import org.codehaus.jettison.json.JSONArray;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -12,13 +13,21 @@ public class JettisonArrayAdapter<V> implements ArrayAdapter<JSONArray, V> {
     final BiFunction<JSONArray, Integer, V> valueExtractor;
 
     public JettisonArrayAdapter() {
-        this(Try.onBiFunction((jsonArray, index) -> (V) jsonArray.get(index)));
+        this(() -> new JSONArray());
     }
+
+    public JettisonArrayAdapter(Supplier<JSONArray> initializer) {
+        this(initializer, Try.onBiFunction((jsonArray, index) -> (V) jsonArray.get(index)));
+    }
+
     public JettisonArrayAdapter(BiFunction<JSONArray, Integer, V> valueExtractor) {
         this(JSONArray::new, valueExtractor);
     }
 
     public JettisonArrayAdapter(Supplier<JSONArray> initializer, BiFunction<JSONArray, Integer, V> valueExtractor) {
+        Objects.requireNonNull(initializer);
+        Objects.requireNonNull(valueExtractor);
+
         this.initializer = initializer;
         this.valueExtractor = valueExtractor;
     }

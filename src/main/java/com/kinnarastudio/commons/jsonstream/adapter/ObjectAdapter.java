@@ -7,7 +7,7 @@ import java.util.Iterator;
  *
  * @param <J>    Json Object class
  */
-public interface ObjectAdapter<J> {
+public interface ObjectAdapter<J, V> {
     J initialize();
 
     /**
@@ -26,7 +26,7 @@ public interface ObjectAdapter<J> {
      * @param key
      * @return
      */
-    <V> V getValue(J json, String key);
+    V getValue(J json, String key);
 
-    <V> void putValue(J json, String key, V value);
+    void putValue(J json, String key, V value);
 }

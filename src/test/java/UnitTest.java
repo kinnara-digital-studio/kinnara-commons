@@ -70,7 +70,7 @@ public class UnitTest {
     @Test
     public void jettison() {
         final String[] input = new String[] {"a", "a", "a", "c"};
-        JettisonObjectAdapter objectAdapter = new JettisonObjectAdapter();
+        JettisonObjectAdapter<String> objectAdapter = new JettisonObjectAdapter<>();
 
         JettisonArrayAdapter<String> arrayAdapter = new JettisonArrayAdapter<>();
 

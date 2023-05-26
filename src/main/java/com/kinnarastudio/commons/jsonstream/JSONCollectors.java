@@ -32,7 +32,7 @@ public final class JSONCollectors {
      * @param <T> Source data type
      * @param <V> Json object value type
      */
-    public static <J, T, V> Collector<T, J, J> toJson(ObjectAdapter<J> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor, BinaryOperator<J> combiner, Function<J, J> finisher) {
+    public static <J, T, V> Collector<T, J, J> toJson(ObjectAdapter<J, V> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor, BinaryOperator<J> combiner, Function<J, J> finisher) {
         Objects.requireNonNull(adapter);
         Objects.requireNonNull(keyExtractor);
         Objects.requireNonNull(valueExtractor);
@@ -63,7 +63,7 @@ public final class JSONCollectors {
      * @param <T> Source data type
      * @param <V> Json object value type
      */
-    public static <J, T, V> Collector<T, J, J>  toJson(ObjectAdapter<J> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor, Function<J, J> finisher) {
+    public static <J, T, V> Collector<T, J, J>  toJson(ObjectAdapter<J, V> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor, Function<J, J> finisher) {
         return toJson(adapter, keyExtractor, valueExtractor, (accepted, ignored) -> accepted, finisher);
     }
 
@@ -79,7 +79,7 @@ public final class JSONCollectors {
      * @param <T> Source data type
      * @param <V> Json object value type
      */
-    public static <J, T, V> Collector<T, J, J>  toJson(ObjectAdapter<J> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor) {
+    public static <J, T, V> Collector<T, J, J>  toJson(ObjectAdapter<J, V> adapter, Function<T, String> keyExtractor, Function<T, V> valueExtractor) {
         return toJson(adapter, keyExtractor, valueExtractor, j -> j);
     }
 
@@ -149,12 +149,8 @@ public final class JSONCollectors {
      * @param <V> Json object value data type
      */
     public static <T, V> Collector<T, JSONObject, JSONObject> toJSONObject(Supplier<JSONObject> initializer, Function<T, String> keyExtractor, Function<T, V> valueExtractor, BinaryOperator<JSONObject> combiner, Function<JSONObject, JSONObject> finisher) {
-        final JSONObjectAdapter adapter = new JSONObjectAdapter() {
-            @Override
-            public JSONObject initialize() {
-                return initializer.get();
-            }
-        };
+        Objects.requireNonNull(initializer);
+        final JSONObjectAdapter<V> adapter = new JSONObjectAdapter<>(initializer);
         return toJson(adapter, keyExtractor, valueExtractor, combiner, finisher);
     }
 

@@ -3,6 +3,7 @@ package com.kinnarastudio.commons.jsonstream.adapter.impl;
 import com.kinnarastudio.commons.jsonstream.adapter.ArrayAdapter;
 import org.json.JSONArray;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -16,7 +17,7 @@ public class JSONArrayAdapter<V> implements ArrayAdapter<JSONArray, V> {
     final BiFunction<JSONArray, Integer, V> valueExtractor;
 
     public JSONArrayAdapter() {
-        this((jsonArray, index) -> (V) jsonArray.get(index));
+        this(JSONArray::new);
     }
 
     public JSONArrayAdapter(Supplier<JSONArray> initializer) {
@@ -28,6 +29,9 @@ public class JSONArrayAdapter<V> implements ArrayAdapter<JSONArray, V> {
     }
 
     public JSONArrayAdapter(Supplier<JSONArray> initializer, BiFunction<JSONArray, Integer, V> valueExtractor) {
+        Objects.requireNonNull(initializer);
+        Objects.requireNonNull(valueExtractor);
+
         this.initializer = initializer;
         this.valueExtractor = valueExtractor;
     }

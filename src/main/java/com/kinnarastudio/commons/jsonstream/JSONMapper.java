@@ -15,15 +15,15 @@ import java.util.stream.Stream;
  * Json Mapper
  */
 public final class JSONMapper {
-    public static <J, V> J concat(ArrayAdapter<J, V> adapter, J array1, J array2) {
+    public static <J, V> J concat(ArrayAdapter<J, V> adapter, J left, J right) {
         return Stream
-                .concat(JSONStream.of(adapter, array1), JSONStream.of(adapter, array2))
+                .concat(JSONStream.of(adapter, left), JSONStream.of(adapter, right))
                 .collect(JSONCollectors.toJson(adapter));
     }
 
-    public static <T> JSONArray concat(JSONArray array1, JSONArray array2) {
+    public static <T> JSONArray concat(JSONArray left, JSONArray right) {
         final JSONArrayAdapter<T> adapter = new JSONArrayAdapter<>();
-        return concat(adapter, array1, array2);
+        return concat(adapter, left, right);
     }
 
     /**
@@ -33,7 +33,7 @@ public final class JSONMapper {
      * @param right
      * @return
      */
-    public static <J, T> J combine(ObjectAdapter<J> adapter, J left, J right) {
+    public static <J, V> J combine(ObjectAdapter<J, V> adapter, J left, J right) {
         return Stream.concat(JSONStream.of(adapter, left), JSONStream.of(adapter, right))
                 .collect(JSONCollectors.toJson(adapter, JSONObjectEntry::getKey, JSONObjectEntry::getValue));
     }
@@ -45,8 +45,8 @@ public final class JSONMapper {
      * @param right
      * @return
      */
-    public static <T> JSONObject combine(JSONObject left, JSONObject right) {
-        final JSONObjectAdapter adapter = new JSONObjectAdapter();
+    public static <V> JSONObject combine(JSONObject left, JSONObject right) {
+        final JSONObjectAdapter<V> adapter = new JSONObjectAdapter<>();
         return combine(adapter, left, right);
     }
 }
