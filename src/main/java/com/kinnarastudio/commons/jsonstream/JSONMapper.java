@@ -4,6 +4,7 @@ import com.kinnarastudio.commons.jsonstream.adapter.ArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.ObjectAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONObjectAdapter;
+import com.kinnarastudio.commons.jsonstream.model.JSONObjectEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

@@ -1,4 +1,4 @@
-package com.kinnarastudio.commons.jsonstream;
+package com.kinnarastudio.commons.jsonstream.model;
 
 import java.util.AbstractMap;
 import java.util.Map;

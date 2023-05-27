@@ -7,6 +7,7 @@ import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONObjectAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonObjectAdapter;
+import com.kinnarastudio.commons.jsonstream.model.JSONObjectEntry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
