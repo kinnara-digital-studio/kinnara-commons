@@ -196,7 +196,6 @@ public final class JSONCollectors {
         return toJSONObject(JSONObject::new, keyExtractor, valueExtractor);
     }
 
-
     /**
      * Collector to {@link JSONArray}
      *
