@@ -3,13 +3,9 @@ package com.kinnarastudio.commons.jsonstream;
 import com.kinnarastudio.commons.Try;
 import com.kinnarastudio.commons.jsonstream.adapter.ArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.ObjectAdapter;
-import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONObjectAdapter;
-import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonArrayAdapter;
 import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONArrayAdapter;
-import com.kinnarastudio.commons.jsonstream.adapter.impl.JettisonObjectAdapter;
+import com.kinnarastudio.commons.jsonstream.adapter.impl.JSONObjectAdapter;
 import com.kinnarastudio.commons.jsonstream.model.JSONObjectEntry;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -54,37 +50,23 @@ public final class JSONStream {
     }
 
     /**
-     * Streamer for {@link JSONObject}
+     * Streamer for {@link org.json.JSONObject}
      *
      * @param jsonObject
      * @param valueExtractor
      * @return
      * @param <V> Json object value type
      */
-    public static <V> Stream<JSONObjectEntry<V>> of(final JSONObject jsonObject, final BiFunction<JSONObject, String, V> valueExtractor) {
+    public static <V> Stream<JSONObjectEntry<V>> of(final org.json.JSONObject jsonObject, final BiFunction<org.json.JSONObject, String, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
         final JSONObjectAdapter<V> adapter = new JSONObjectAdapter<>(valueExtractor);
         return of(adapter, jsonObject);
     }
 
     /**
-     * Streamer for {@link org.codehaus.jettison.json.JSONArray}
-     *
-     * @param jsonObject
-     * @param valueExtractor
-     * @return
-     * @param <V> Json object value type
-     */
-    public static <V> Stream<JSONObjectEntry<V>> of(final org.codehaus.jettison.json.JSONObject jsonObject, final BiFunction<org.codehaus.jettison.json.JSONObject, String, V> valueExtractor) {
-        Objects.requireNonNull(valueExtractor);
-        final JettisonObjectAdapter<V> adapter = new JettisonObjectAdapter<>();
-        return of(adapter, jsonObject);
-    }
-
-    /**
      * Streamer for json array
      *
-     * @param jsonArray
+     * @param jsonArray                                                             
      * @param adapter
      * @return
      * @param <J> Json array class
@@ -104,72 +86,59 @@ public final class JSONStream {
     }
 
     /**
-     * Streamer for {@link JSONArray}
+     * Streamer for {@link org.json.JSONArray}
      *
      * @param jsonArray      Source json array
      * @param valueExtractor Value extractor from json array
      * @return
      * @param <V> Json array content type
      */
-    public static <V> Stream<V> of(final JSONArray jsonArray, final BiFunction<JSONArray, Integer, V> valueExtractor) {
+    public static <V> Stream<V> of(final org.json.JSONArray jsonArray, final BiFunction<org.json.JSONArray, Integer, V> valueExtractor) {
         Objects.requireNonNull(valueExtractor);
         final JSONArrayAdapter<V> adapter = new JSONArrayAdapter<>(valueExtractor);
         return of(adapter, jsonArray);
     }
 
     /**
-     *
-     * @param jsonArray
-     * @param valueExtractor
-     * @return
-     * @param <V> Json array content type
-     */
-    public static <V> Stream<V> of(final org.codehaus.jettison.json.JSONArray jsonArray, final BiFunction<org.codehaus.jettison.json.JSONArray, Integer, V> valueExtractor) {
-        Objects.requireNonNull(valueExtractor);
-        final JettisonArrayAdapter<V> adapter = new JettisonArrayAdapter<>(valueExtractor);
-        return of(adapter, jsonArray);
-    }
-
-    /**
-     * Flatten deep {@link JSONObject} structure into simplified {@link JSONObjectEntry} structure
+     * Flatten deep {@link org.json.JSONObject} structure into simplified {@link JSONObjectEntry} structure
      * with path as entry's key
      * Array's path will be represented as [index]
      *
      * @param jsonObject    source
      * @return
      */
-    public static Stream<JSONObjectEntry<?>> flatten(final JSONObject jsonObject) {
+    public static Stream<JSONObjectEntry<?>> flatten(final org.json.JSONObject jsonObject) {
         return flatten("", jsonObject);
     }
 
     /**
-     * Flatten deep {@link JSONArray} structure into simplified {@link JSONObjectEntry} structure
+     * Flatten deep {@link org.json.JSONArray} structure into simplified {@link JSONObjectEntry} structure
      * with path as entry's key
      * Array's path will be represented as [index]
      *
      * @param jsonArray     source
      * @return
      */
-    public static Stream<JSONObjectEntry<?>> flatten(final JSONArray jsonArray) {
+    public static Stream<JSONObjectEntry<?>> flatten(final org.json.JSONArray jsonArray) {
         return flatten("", jsonArray);
     }
 
     /**
-     * Recursively dig into {@link JSONObject} structure
+     * Recursively dig into {@link org.json.JSONObject} structure
      *
      * @param path          current path
      * @param jsonObject    source
      * @return
      */
-    private static Stream<JSONObjectEntry<?>> flatten(final String path, final JSONObject jsonObject) {
-        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonObject)), JSONStream.of(jsonObject, Try.onBiFunction(JSONObject::get)).flatMap(e -> {
+    private static Stream<JSONObjectEntry<?>> flatten(final String path, final org.json.JSONObject jsonObject) {
+        return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonObject)), JSONStream.of(jsonObject, Try.onBiFunction(org.json.JSONObject::get)).flatMap(e -> {
             final String key = path.isEmpty() ? e.getKey() : String.join(".", path, e.getKey());
             final Object val = e.getValue();
 
-            if (val instanceof JSONObject) {
-                return flatten(key, (JSONObject) val);
-            } else if (val instanceof JSONArray) {
-                return flatten(key, (JSONArray) val);
+            if (val instanceof org.json.JSONObject) {
+                return flatten(key, (org.json.JSONObject) val);
+            } else if (val instanceof org.json.JSONArray) {
+                return flatten(key, (org.json.JSONArray) val);
             } else {
                 return Stream.of(new JSONObjectEntry<>(key, val));
             }
@@ -177,21 +146,21 @@ public final class JSONStream {
     }
 
     /**
-     * Recursively dig into {@link JSONArray} structure
+     * Recursively dig into {@link org.json.JSONArray} structure
      *
      * @param path          current path
      * @param jsonArray     source
      * @return
      */
-    private static Stream<JSONObjectEntry<?>> flatten(final String path, final JSONArray jsonArray) {
+    private static Stream<JSONObjectEntry<?>> flatten(final String path, final org.json.JSONArray jsonArray) {
         return Stream.concat(Stream.of(new JSONObjectEntry<>(path, jsonArray)), JSONStream.of(jsonArray, Try.onBiFunction((a, i) -> new JSONObjectEntry<>(String.valueOf(i), a.get(i))))
                 .flatMap(e -> {
                     final String key = path + "[" + e.getKey() + "]";
                     final Object val = e.getValue();
-                    if (val instanceof JSONObject) {
-                        return flatten(key, (JSONObject) val);
-                    } else if (val instanceof JSONArray) {
-                        return flatten(key, (JSONArray) val);
+                    if (val instanceof org.json.JSONObject) {
+                        return flatten(key, (org.json.JSONObject) val);
+                    } else if (val instanceof org.json.JSONArray) {
+                        return flatten(key, (org.json.JSONArray) val);
                     } else {
                         return Stream.of(new JSONObjectEntry<>(key, val));
                     }

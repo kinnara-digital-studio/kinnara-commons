@@ -19,10 +19,6 @@ public class JSONObjectEntry<V> extends AbstractMap.SimpleImmutableEntry<String,
         super(entry);
     }
 
-    @Override
-    public final String getKey() {
-        return super.getKey();
-    }
 
     @Override
     public final V getValue() {

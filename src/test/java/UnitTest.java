@@ -1,9 +1,6 @@
 import com.kinnarastudio.commons.jsonstream.JSONCollectors;
-import com.kinnarastudio.commons.jsonstream.JSONMapper;
-import com.kinnarastudio.commons.jsonstream.model.JSONObjectEntry;
 import com.kinnarastudio.commons.jsonstream.JSONStream;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.kinnarastudio.commons.jsonstream.model.JSONObjectEntry;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -16,23 +13,23 @@ import java.util.stream.Collectors;
 public class UnitTest {
     @Test
     public void jsonArray() {
-        JSONArray array = new JSONArray();
+        org.json.JSONArray array = new org.json.JSONArray();
         array.put("EEEE");
         array.put("AAAA");
         array.put("DDDD");
         array.put("BBBB");
         array.put("CCCC");
 
-        List<String> list = JSONStream.of(array, JSONArray::getString)
+        List<String> list = JSONStream.of(array, org.json.JSONArray::getString)
                 .sorted(Comparator.comparing(s -> s))
                 .map(String::toLowerCase)
                 .collect(Collectors.toList());
 
-        JSONObject json = JSONStream.of(array, JSONArray::getString)
+        org.json.JSONObject json = JSONStream.of(array, org.json.JSONArray::getString)
                 .sorted()
                 .collect(JSONCollectors.toJSONObject(String::toLowerCase, String::toUpperCase));
 
-        JSONStream.of(json, JSONObject::getString)
+        JSONStream.of(json, org.json.JSONObject::getString)
                 .filter(e -> e.getKey().startsWith("a"))
                 .map(JSONObjectEntry::getValue)
                 .collect(JSONCollectors.toJSONArray());
@@ -42,7 +39,7 @@ public class UnitTest {
     public void jsonObject() {
         final String[] input = new String[] {"a", "a", "a", "c"};
 
-        JSONObject jsonObject = Arrays.stream(input)
+        org.json.JSONObject jsonObject = Arrays.stream(input)
                 .collect(JSONCollectors.toJSONObject(String::toUpperCase, String::toLowerCase));
 
         Assert.assertTrue(jsonObject.has("A"));
@@ -52,7 +49,7 @@ public class UnitTest {
         Assert.assertEquals("a", jsonObject.getString("A"));
         Assert.assertEquals("c", jsonObject.getString("C"));
 
-        Collection<String> collection = JSONStream.of(jsonObject, JSONObject::getString)
+        Collection<String> collection = JSONStream.of(jsonObject, org.json.JSONObject::getString)
                 .map(JSONObjectEntry::getKey)
                 .collect(Collectors.toSet());
 
