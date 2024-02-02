@@ -5,25 +5,21 @@ Decluttering JAVA 8 lamda programing and stream API
 ## Functional Interfaces ###
 #### Example
 ```java
-class Yourclass implements com.kinnarastudio.commons.Declutter {
-    public yourMethod() {
-        Collection<String> myStringCollection = ...
-        
-        // turns this
-        myStringCollection.forEach(s -> {
-            try {
-                // some code that throws exceptions
-            } catch (Exception e) {
-            
-            }
-        });
-        
-        // to this
-        myStringCollection.forEach(Try.onConsumer(s -> {
-             // some code that throws exceptions
-        });
+Collection<String> myStringCollection = ...
+
+// turns this
+myStringCollection.forEach(s -> {
+    try {
+        // some code that throws exceptions
+    } catch (Exception e) {
+    
     }
-}
+});
+
+// to this
+myStringCollection.forEach(Try.onConsumer(s -> {
+     // some code that throws exceptions
+});
 ```
 
 ### Throwable BiConsumer ####
